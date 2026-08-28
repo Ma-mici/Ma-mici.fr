@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compte en attente de validation — Ma Mici</title>
+<meta name="description" content="Ton compte Ma Mici a été créé : confirme ton adresse email pour accéder au site.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg-flat:#EEEAFB;
+    --violet-100:#EFE8FC;
+    --violet-300:#C9B8F2;
+    --violet-500:#9B87E8;
+    --violet-700:#C7B8EA;
+    --ink:#2E2A44;
+    --ink-soft:#655F80;
+    --white:#FFFFFF;
+    --mint:#7FCFB6;
+    --mint-soft:#DCF4EC;
+    --line: rgba(46,42,68,0.10);
+    --shadow: 0 20px 45px -20px rgba(76,61,138,0.35);
+    --radius-lg: 32px;
+    --radius-md: 22px;
+    --radius-sm: 14px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    background: var(--bg-flat);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.font-display{ font-family:'Baloo 2', sans-serif; color:var(--ink); margin:0; }
+  p{ margin:0; line-height:1.65; color:var(--ink-soft); }
+  a{ text-decoration:none; color:inherit; }
+  img,svg{ display:block; max-width:100%; }
+  button{ font-family:inherit; cursor:pointer; border:none; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  :focus-visible{ outline:3px solid var(--violet-500); outline-offset:3px; border-radius:6px; }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(246,242,253,0.78);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; padding:16px 28px; }
+  .logo{ display:flex; align-items:center; gap:10px; font-family:'Baloo 2'; font-weight:700; font-size:1.35rem; color:var(--violet-700); }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 22px; border-radius:100px; font-weight:700; font-size:0.95rem;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{ background:var(--violet-700); color:var(--ink); box-shadow:0 12px 24px -10px rgba(76,61,138,0.3); }
+  .btn-primary:hover{ background:#5A4BAE; color:var(--white); transform:translateY(-2px); }
+  .btn-ghost{ background:transparent; color:var(--ink); border:2px solid var(--violet-300); }
+  .btn-ghost:hover{ background:var(--violet-100); }
+  .btn:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
+
+  /* ---------- Footer ---------- */
+  footer{ border-top:1px solid var(--line); padding:44px 0 34px; }
+  .footer-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+  .footer-links{ display:flex; gap:26px; flex-wrap:wrap; }
+  .footer-links a{ font-size:0.9rem; color:var(--ink-soft); font-weight:600; }
+  .footer-links a:hover{ color:var(--ink); }
+  .footer-note{ font-size:0.82rem; color:var(--ink-soft); margin-top:20px; text-align:center; }
+  .footer-note + .footer-note{ margin-top:8px; }
+
+  @media (max-width:560px){
+    .wrap{ padding:0 20px; }
+  }
+
+  /* ---------- Carte ---------- */
+  .pending-main{ padding:70px 0 90px; display:flex; justify-content:center; }
+  .pending-card{
+    background:var(--white); border-radius:var(--radius-lg); box-shadow:var(--shadow);
+    border:1px solid var(--line); padding:46px 40px; max-width:480px; width:100%; text-align:center;
+  }
+  .icon-circle{
+    width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:2rem; margin:0 auto 22px; background:var(--violet-100);
+  }
+  .pending-card h1{ font-size:1.5rem; margin-bottom:16px; }
+  .pending-card p{ font-size:0.95rem; margin-bottom:10px; }
+  .pending-card p strong{ color:var(--ink); }
+  .pending-tip{ font-size:0.85rem; font-style:italic; margin-top:18px; }
+  .resend-row{ margin-top:26px; padding-top:22px; border-top:1px solid var(--line); }
+  .resend-msg{ display:block; font-size:0.85rem; margin-top:10px; }
+  .resend-msg.success{ color:#1F6B52; font-weight:600; }
+  .resend-msg.error{ color:#C0392B; font-weight:600; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-row wrap">
+    <a href="index.html" class="logo">Ma Mici</a>
+    <a href="connexion.html" class="btn btn-ghost">Se connecter</a>
+  </div>
+</header>
+
+<main class="pending-main">
+  <div class="wrap">
+    <div class="pending-card">
+      <div class="icon-circle">📬</div>
+      <h1>Compte en attente de validation</h1>
+      <p>Ton compte Ma Mici a bien été créé pour <strong id="pending-email">ton adresse email</strong>.</p>
+      <p>Pour accéder au site, clique sur le lien de confirmation que nous venons de t'envoyer par email.</p>
+      <p class="pending-tip">Pense à vérifier tes spams si tu ne le vois pas d'ici quelques minutes.</p>
+
+      <div class="resend-row">
+        <button type="button" class="btn btn-ghost" id="resend-btn">Renvoyer l'email de confirmation</button>
+        <span class="resend-msg" id="resend-msg"></span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <a href="index.html" class="logo" style="font-size:1.1rem;">Ma Mici</a>
+      <nav class="footer-links">
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="politique-confidentialite.html">Politique de confidentialité</a>
+        <a href="cgu.html">Conditions générales d'utilisation</a>
+        <a href="politique-cookies.html">Politique de cookies</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+    <p class="footer-note">Ma Mici est un outil d'accompagnement et ne remplace pas un avis médical. En cas de doute, parles-en à ton professionnel de santé.</p>
+    <p class="footer-note">© <span id="copyright-year">2026</span> Ma Mici</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('copyright-year').textContent = new Date().getFullYear();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = 'https://kuuvsijfaotfuerkltax.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<script>
+  (function(){
+    const email = sessionStorage.getItem('mamici_pending_email');
+    if (email){
+      document.getElementById('pending-email').textContent = email;
+    }
+
+    const resendBtn = document.getElementById('resend-btn');
+    const resendMsg = document.getElementById('resend-msg');
+
+    resendBtn.addEventListener('click', async function(){
+      if (!email){
+        resendMsg.textContent = "Adresse introuvable. Recommence la création de compte.";
+        resendMsg.className = 'resend-msg error';
+        return;
+      }
+      resendBtn.disabled = true;
+      resendBtn.textContent = 'Envoi en cours...';
+      resendMsg.textContent = '';
+      resendMsg.className = 'resend-msg';
+
+      try {
+        const { error } = await supabaseClient.auth.resend({ type: 'signup', email: email });
+        if (error){
+          resendMsg.textContent = "Impossible de renvoyer l'email pour l'instant. Réessaie dans quelques instants.";
+          resendMsg.className = 'resend-msg error';
+        } else {
+          resendMsg.textContent = "Email renvoyé ! Vérifie ta boîte mail (et tes spams).";
+          resendMsg.className = 'resend-msg success';
+        }
+      } catch(err){
+        resendMsg.textContent = "Une erreur inattendue est survenue.";
+        resendMsg.className = 'resend-msg error';
+      } finally {
+        resendBtn.disabled = false;
+        resendBtn.textContent = "Renvoyer l'email de confirmation";
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
