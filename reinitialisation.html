@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choisir un nouveau mot de passe — Ma Mici</title>
+<meta name="description" content="Choisis un nouveau mot de passe pour ton compte Ma Mici.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg-flat:#EEEAFB;
+    --violet-100:#EFE8FC;
+    --violet-300:#C9B8F2;
+    --violet-500:#9B87E8;
+    --violet-700:#C7B8EA;
+    --violet-900:#C7B8EA;
+    --ink:#2E2A44;
+    --ink-soft:#655F80;
+    --white:#FFFFFF;
+    --peach:#FFB199;
+    --peach-soft:#FFE3D8;
+    --mint:#7FCFB6;
+    --mint-soft:#DCF4EC;
+    --line: rgba(46,42,68,0.10);
+    --shadow: 0 20px 45px -20px rgba(76,61,138,0.35);
+    --radius-lg: 32px;
+    --radius-md: 22px;
+    --radius-sm: 14px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    background: var(--bg-flat);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.font-display{ font-family:'Baloo 2', sans-serif; color:var(--ink); margin:0; }
+  p{ margin:0; line-height:1.65; color:var(--ink-soft); }
+  a{ text-decoration:none; color:inherit; }
+  ul{ list-style:none; margin:0; padding:0; }
+  img,svg{ display:block; max-width:100%; }
+  button{ font-family:inherit; cursor:pointer; border:none; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  :focus-visible{ outline:3px solid var(--violet-500); outline-offset:3px; border-radius:6px; }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(246,242,253,0.78);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; padding:16px 28px; }
+  .logo{ display:flex; align-items:center; gap:10px; font-family:'Baloo 2'; font-weight:700; font-size:1.35rem; color:var(--violet-700); }
+  .logo-mark{ width:34px; height:34px; object-fit:contain; display:block; }
+  nav.links{ display:flex; gap:30px; }
+  nav.links a{ font-weight:600; font-size:0.95rem; color:var(--ink-soft); transition:color .2s; }
+  nav.links a:hover{ color:var(--ink); }
+  .nav-cta{ display:flex; gap:10px; align-items:center; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 22px; border-radius:100px; font-weight:700; font-size:0.95rem;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{ background:var(--violet-700); color:var(--ink); box-shadow:0 12px 24px -10px rgba(76,61,138,0.3); }
+  .btn-primary:hover{ background:#5A4BAE; color:var(--white); transform:translateY(-2px); }
+  .btn-primary:disabled{ opacity:0.65; cursor:not-allowed; transform:none; }
+  .btn-ghost{ background:transparent; color:var(--ink); border:2px solid var(--violet-300); }
+  .btn-ghost:hover{ background:var(--violet-100); }
+  .burger{ display:none; background:none; padding:8px; }
+  .burger span{ display:block; width:24px; height:2.5px; background:var(--ink); margin:5px 0; border-radius:2px; }
+
+  /* ---------- Footer ---------- */
+  footer{ border-top:1px solid var(--line); padding:44px 0 34px; }
+  .footer-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+  .footer-links{ display:flex; gap:26px; flex-wrap:wrap; }
+  .footer-links a{ font-size:0.9rem; color:var(--ink-soft); font-weight:600; }
+  .footer-links a:hover{ color:var(--ink); }
+  .footer-note{ font-size:0.82rem; color:var(--ink-soft); margin-top:20px; text-align:center; }
+  .footer-note + .footer-note{ margin-top:8px; }
+
+  @media (max-width:980px){
+    nav.links{ display:none; }
+    .burger{ display:block; }
+  }
+  @media (max-width:560px){
+    .wrap{ padding:0 20px; }
+  }
+
+  /* ---------- Carte ---------- */
+  .login-main{ padding:60px 0 90px; display:flex; justify-content:center; }
+  .login-card{
+    background:var(--white); border-radius:var(--radius-lg); box-shadow:var(--shadow);
+    border:1px solid var(--line); padding:44px 40px; max-width:440px; width:100%;
+  }
+  .login-card h1{ font-size:1.6rem; text-align:center; margin-bottom:10px; }
+  .login-sub{ display:block; text-align:center; font-size:0.95rem; margin-bottom:26px; }
+  .form-row{ margin-bottom:18px; }
+  .form-row label{ display:block; font-weight:700; font-size:0.88rem; margin-bottom:6px; }
+  .form-row input{
+    width:100%; padding:13px 16px; border-radius:var(--radius-sm); border:1.5px solid var(--line);
+    background:var(--bg-flat); font-family:inherit; font-size:0.95rem; color:var(--ink);
+  }
+  .form-row input:focus{ outline:none; border-color:var(--violet-500); box-shadow:0 0 0 4px rgba(155,135,232,0.22); }
+  .hint{ display:block; font-size:0.78rem; margin-top:6px; }
+  .form-error{ display:none; color:#C0392B; font-size:0.85rem; font-weight:600; margin:-6px 0 14px; }
+  .form-success{ display:none; background:var(--mint-soft); color:#1F6B52; font-size:0.9rem; font-weight:600; padding:14px 16px; border-radius:var(--radius-sm); margin-bottom:20px; text-align:center; }
+  .login-submit{ width:100%; justify-content:center; font-size:1rem; padding:14px 22px; }
+  .login-signup-link{ text-align:center; font-size:0.88rem; margin-top:18px; }
+  .login-signup-link a{ color:var(--violet-700); font-weight:700; }
+  .back-home-row{ text-align:center; margin-top:18px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-row wrap">
+    <a href="index.html" class="logo">
+      Ma Mici
+    </a>
+    <nav class="links">
+      <a href="index.html#comprendre">Comprendre</a>
+      <a href="index.html#propose">Ce qu'on propose</a>
+      <a href="index.html#ages">Pour tous les âges</a>
+      <a href="index.html#francophonie">Pays</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="connexion.html" class="btn btn-ghost">Se connecter</a>
+    </div>
+    <button class="burger" aria-label="Ouvrir le menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main class="login-main">
+  <div class="wrap">
+    <div class="login-card">
+
+      <h1>Nouveau mot de passe</h1>
+      <span class="login-sub">Choisis le mot de passe que tu utiliseras pour te connecter à Ma Mici.</span>
+
+      <span class="form-success" id="reset-success">Mot de passe mis à jour ! Tu vas être redirigé·e vers la connexion...</span>
+
+      <form id="new-password-form" novalidate>
+        <div class="form-row">
+          <label for="password">Nouveau mot de passe</label>
+          <input type="password" id="password" name="password" autocomplete="new-password" minlength="8" required>
+          <span class="hint">8 caractères minimum.</span>
+        </div>
+
+        <div class="form-row">
+          <label for="password2">Confirmer le mot de passe</label>
+          <input type="password" id="password2" name="password2" autocomplete="new-password" minlength="8" required>
+        </div>
+
+        <span class="form-error" id="reset-error"></span>
+
+        <button type="submit" class="btn btn-primary login-submit" id="reset-submit-btn">Mettre à jour mon mot de passe</button>
+
+        <p class="login-signup-link">Le lien a expiré ? <a href="mot-de-passe-oublie.html">Redemander un lien</a></p>
+      </form>
+
+      <div class="back-home-row">
+        <a href="connexion.html" class="btn btn-ghost">← Retour à la connexion</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <a href="index.html" class="logo" style="font-size:1.1rem;">
+        Ma Mici
+      </a>
+      <nav class="footer-links">
+        <a href="mentions-legales.html">Mentions légales</a>
+        <a href="politique-confidentialite.html">Politique de confidentialité</a>
+        <a href="cgu.html">Conditions générales d'utilisation</a>
+        <a href="politique-cookies.html">Politique de cookies</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+    <p class="footer-note">Ma Mici est un outil d'accompagnement et ne remplace pas un avis médical. En cas de doute, parles-en à ton professionnel de santé.</p>
+    <p class="footer-note">© <span id="copyright-year">2026</span> Ma Mici</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('copyright-year').textContent = new Date().getFullYear();
+  const burger = document.querySelector('.burger');
+  const links = document.querySelector('nav.links');
+  burger.addEventListener('click', () => {
+    const open = links.style.display === 'flex';
+    links.style.display = open ? 'none' : 'flex';
+    links.style.cssText += open ? '' : 'position:absolute;top:100%;left:0;right:0;background:#F6F2FD;flex-direction:column;padding:20px 28px;gap:18px;border-bottom:1px solid rgba(46,42,68,0.1);';
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  // --- Configuration Supabase (mêmes identifiants que connexion.html / creer-compte.html) ---
+  const SUPABASE_URL = 'https://kuuvsijfaotfuerkltax.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<script>
+  (function(){
+    const form = document.getElementById('new-password-form');
+    const resetError = document.getElementById('reset-error');
+    const resetSuccess = document.getElementById('reset-success');
+    const submitBtn = document.getElementById('reset-submit-btn');
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      resetError.style.display = 'none';
+      resetError.textContent = '';
+
+      if(!form.checkValidity()){
+        form.reportValidity();
+        return;
+      }
+
+      const password = document.getElementById('password').value;
+      const password2 = document.getElementById('password2').value;
+
+      if(password !== password2){
+        resetError.textContent = "Les deux mots de passe ne correspondent pas.";
+        resetError.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Mise à jour en cours...';
+
+      try {
+        const { error } = await supabaseClient.auth.updateUser({ password: password });
+
+        if(error){
+          const msg = (error.message || '').toLowerCase();
+          if(msg.includes('session') || msg.includes('auth session missing') || msg.includes('jwt')){
+            resetError.textContent = "Ce lien de réinitialisation n'est plus valide (il a peut-être déjà été utilisé ou a expiré). Redemande un nouveau lien depuis \u00ab Mot de passe oublié \u00bb.";
+          } else if(msg.includes('should be different from the old password')){
+            resetError.textContent = "Ton nouveau mot de passe doit être différent de l'ancien. Choisis-en un autre.";
+          } else if(msg.includes('at least') && msg.includes('character')){
+            resetError.textContent = "Ton mot de passe est trop court (8 caractères minimum).";
+          } else {
+            resetError.textContent = "Impossible de mettre à jour le mot de passe : " + (error.message || "erreur inconnue") + ".";
+          }
+          resetError.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Mettre à jour mon mot de passe';
+          return;
+        }
+
+        form.style.display = 'none';
+        resetSuccess.style.display = 'block';
+        setTimeout(() => { window.location.href = 'connexion.html'; }, 2500);
+
+      } catch(err){
+        resetError.textContent = "Une erreur inattendue est survenue. Réessaie dans quelques instants.";
+        resetError.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Mettre à jour mon mot de passe';
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
