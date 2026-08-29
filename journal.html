@@ -458,7 +458,11 @@
   .bilan-empty{ font-size:0.88rem; font-style:italic; }
   .bilan-header-print{ display:none; }
   .bilan-brand{ display:flex; align-items:center; gap:14px; }
-  .bilan-logo{ width:44px; height:44px; object-fit:contain; }
+  .bilan-logo-mono{
+    width:44px; height:44px; border-radius:50%; background:var(--violet-500); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-family:'Baloo 2'; font-weight:800;
+    font-size:1.3rem; flex-shrink:0; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
   .bilan-header-print h1{ font-family:'Baloo 2'; font-size:1.4rem; color:var(--violet-700); margin:0; }
   .bilan-tagline{ font-size:0.82rem; margin-top:2px; }
   .bilan-footer-print{ display:none; }
@@ -1112,7 +1116,7 @@
     let html = '';
     html += '<div class="bilan-header-print">'
       + '<div class="bilan-brand">'
-        + '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABfCAYAAAAXtMJAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAABQklEQVR4nO3aQQqCQBgF4L9RB2gTnaFj1AlaVptu0LqjRacIou4RQVAX6qKgIAoiSBTBRXHhCzFmYWaEP4Rk/ObpuIzMDxgAAJDsAeaAg4v2eaHqZoyIeoBUmGkuvygADhBODqAAtQAAAABJRU5ErkJggg==" alt="Ma Mici" class="bilan-logo">'
+        + '<div class="bilan-logo-mono">M</div>'
         + '<div><h1>Ma Mici</h1><p class="bilan-tagline">Ton compagnon santé pour la MICI &middot; ma-mici.fr</p></div>'
       + '</div>'
       + '<h2 style="border:none; padding:0; margin:18px 0 4px;">Bilan de suivi mensuel</h2>'
