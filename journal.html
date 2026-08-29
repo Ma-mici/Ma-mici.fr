@@ -438,6 +438,44 @@
   .tx-item-meta{ width:100%; display:flex; gap:14px; flex-wrap:wrap; font-size:0.78rem; color:var(--ink-soft); margin-top:2px; }
   .tx-side-effects{ width:100%; background:var(--peach-soft); color:#8A4326; font-size:0.8rem; padding:8px 12px; border-radius:12px; margin-top:6px; }
 
+  /* ---------- Bilan mensuel ---------- */
+  .bilan-controls{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .bilan-controls select{
+    padding:12px 18px; border-radius:100px; border:1.5px solid var(--line);
+    background:var(--bg-flat); font-family:inherit; font-size:0.92rem; color:var(--ink);
+  }
+  .bilan-report-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:22px; }
+  .bilan-section{ margin-bottom:24px; }
+  .bilan-section:last-child{ margin-bottom:0; }
+  .bilan-section h3{ font-size:1rem; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+  .bilan-stats-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:8px; }
+  .bilan-stat{ background:var(--bg-flat); border-radius:var(--radius-md); padding:14px; text-align:center; }
+  .bilan-stat .val{ font-family:'Baloo 2'; font-weight:800; font-size:1.3rem; }
+  .bilan-stat .lbl{ font-size:0.72rem; color:var(--ink-soft); font-weight:600; margin-top:2px; }
+  .bilan-list{ font-size:0.9rem; }
+  .bilan-list li{ padding:6px 0; border-bottom:1px solid var(--line); }
+  .bilan-list li:last-child{ border-bottom:none; }
+  .bilan-empty{ font-size:0.88rem; font-style:italic; }
+  .bilan-header-print{ display:none; }
+  .bilan-brand{ display:flex; align-items:center; gap:14px; }
+  .bilan-logo{ width:44px; height:44px; object-fit:contain; }
+  .bilan-header-print h1{ font-family:'Baloo 2'; font-size:1.4rem; color:var(--violet-700); margin:0; }
+  .bilan-tagline{ font-size:0.82rem; margin-top:2px; }
+  .bilan-footer-print{ display:none; }
+
+  @media print{
+    header, footer, .no-print{ display:none !important; }
+    body{ background:#fff; }
+    .wrap{ max-width:none; padding:0; }
+    main{ padding:0 !important; }
+    .panel-card{ box-shadow:none; border:none; padding:0; }
+    #bilan-report{ display:block !important; }
+    .page-head, .journal-grid, .score-card, .stats-row, .avg-card, .history-list{ display:none !important; }
+    .panel-card:not(#bilan-report){ display:none !important; }
+    .bilan-header-print{ display:block; margin-bottom:24px; }
+    .bilan-footer-print{ display:block; margin-top:32px; padding-top:16px; border-top:1px solid var(--line); font-size:0.78rem; color:var(--ink-soft); text-align:center; }
+  }
+
   @media (max-width:820px){
     .journal-grid{ grid-template-columns:1fr; }
     .stats-row{ grid-template-columns:1fr; }
@@ -673,6 +711,23 @@
         <h2>Tes derniers jours</h2>
         <div class="history-list" id="history-list"></div>
       </div>
+
+      <div class="panel-card no-print">
+        <h2>Bilan mensuel</h2>
+        <p style="text-align:center; margin-bottom:18px;">Génère un résumé synthétique du mois à partager avec ton gastro-entérologue.</p>
+        <div class="bilan-controls">
+          <select id="bilan-month"></select>
+          <button type="button" class="btn btn-primary" id="bilan-generate-btn">Générer mon bilan du mois</button>
+        </div>
+      </div>
+
+      <div class="panel-card" id="bilan-report" style="display:none;">
+        <div class="bilan-report-head no-print">
+          <h2 style="margin-bottom:0;">Aperçu du bilan</h2>
+          <button type="button" class="btn btn-primary" id="bilan-print-btn">Imprimer / Enregistrer en PDF</button>
+        </div>
+        <div id="bilan-content"></div>
+      </div>
     </section>
 
   </div>
@@ -729,19 +784,10 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  (async function(){
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    if (!session){
-      window.location.href = 'connexion.html';
-      return;
-    }
-
-    document.getElementById('logout-btn').addEventListener('click', async function(){
-      await supabaseClient.auth.signOut();
-      window.location.href = 'connexion.html';
-    });
-  })();
+  document.getElementById('logout-btn').addEventListener('click', async function(){
+    await supabaseClient.auth.signOut();
+    window.location.href = 'connexion.html';
+  });
 </script>
 
 
@@ -847,7 +893,25 @@
   const quickLabelMap = { glaires: 'Glaires', sang: 'Sang', urgence: 'Urgence/impériosité', douleurs: 'Douleurs' };
 
   let journalEntries = [];
-  try { journalEntries = JSON.parse(localStorage.getItem('mamici_journal') || '[]'); } catch(e){ journalEntries = []; }
+  let currentUserId = null;
+
+  function mapJournalRow(r){
+    return {
+      date: r.date, pain: r.pain, fatigue: r.fatigue, mood: r.mood, moods: r.moods || [],
+      note: r.note || '', score: Number(r.score), stoolCount: r.stool_count,
+      bristol: r.bristol, bristolKind: r.bristol_kind, quickFlags: r.quick_flags || []
+    };
+  }
+
+  async function loadJournalEntries(){
+    const { data, error } = await supabaseClient
+      .from('journal_entries')
+      .select('date, pain, fatigue, mood, moods, note, score, stool_count, bristol, bristol_kind, quick_flags')
+      .eq('user_id', currentUserId)
+      .order('date', { ascending: true });
+    if (error){ console.error(error); return; }
+    journalEntries = (data || []).map(mapJournalRow);
+  }
 
   const scoreCircle = document.getElementById('score-circle');
   const scoreNum = document.getElementById('score-num');
@@ -932,7 +996,7 @@
     historyList.innerHTML = html;
   }
 
-  document.getElementById('j-save-btn').addEventListener('click', () => {
+  document.getElementById('j-save-btn').addEventListener('click', async () => {
     const pain = Number(painSlider.value);
     const fatigue = Number(fatigueSlider.value);
     const mood = Number(moodSlider.value);
@@ -942,13 +1006,28 @@
     const today = todayISO();
     const score = computeScore(pain, fatigue, mood);
 
+    const saveBtn = document.getElementById('j-save-btn');
+    saveBtn.disabled = true;
+
+    const { error } = await supabaseClient
+      .from('journal_entries')
+      .upsert({
+        user_id: currentUserId, date: today, pain, fatigue, mood, moods, note, score,
+        stool_count: stoolCount, bristol: selectedBristol,
+        bristol_kind: selectedBristol ? bristolKind(selectedBristol) : null,
+        quick_flags: quickFlags
+      }, { onConflict: 'user_id,date' });
+
+    saveBtn.disabled = false;
+
+    if (error){
+      console.error(error);
+      alert("Impossible d'enregistrer ton journal : " + error.message);
+      return;
+    }
+
     journalEntries = journalEntries.filter(e => e.date !== today);
-    journalEntries.push({
-      date: today, pain, fatigue, mood, moods, note, score,
-      stoolCount, bristol: selectedBristol, bristolKind: selectedBristol ? bristolKind(selectedBristol) : null,
-      quickFlags
-    });
-    try { localStorage.setItem('mamici_journal', JSON.stringify(journalEntries)); } catch(e){}
+    journalEntries.push({ date: today, pain, fatigue, mood, moods, note, score, stoolCount, bristol: selectedBristol, bristolKind: selectedBristol ? bristolKind(selectedBristol) : null, quickFlags });
 
     renderJournalStats();
     renderJournalHistory();
@@ -958,8 +1037,158 @@
     setTimeout(() => msg.style.display = 'none', 3000);
   });
 
-  renderJournalStats();
-  renderJournalHistory();
+  (async function init(){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session){
+      window.location.href = 'connexion.html';
+      return;
+    }
+    currentUserId = session.user.id;
+    await loadJournalEntries();
+    renderJournalStats();
+    renderJournalHistory();
+  })();
+
+  /* ============== BILAN MENSUEL ============== */
+  const bilanMonthSelect = document.getElementById('bilan-month');
+  const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+  (function populateBilanMonths(){
+    const options = [];
+    const d = new Date();
+    for (let i = 0; i < 12; i++){
+      const y = d.getFullYear(), m = d.getMonth();
+      const value = y + '-' + pad(m + 1);
+      options.push('<option value="' + value + '">' + monthNames[m] + ' ' + y + '</option>');
+      d.setMonth(d.getMonth() - 1);
+    }
+    bilanMonthSelect.innerHTML = options.join('');
+  })();
+
+  function quickFlagLabel(q){
+    const map = { glaires: 'Glaires', sang: 'Sang', urgence: 'Urgence/impériosité', douleurs: 'Douleurs' };
+    return map[q] || q;
+  }
+
+  document.getElementById('bilan-generate-btn').addEventListener('click', async () => {
+    const [yearStr, monthStr] = bilanMonthSelect.value.split('-');
+    const year = Number(yearStr), month = Number(monthStr) - 1;
+    const prefix = yearStr + '-' + monthStr;
+
+    const entries = journalEntries.filter(e => e.date.startsWith(prefix)).sort((a,b) => a.date.localeCompare(b.date));
+
+    const genBtn = document.getElementById('bilan-generate-btn');
+    genBtn.disabled = true;
+    const { data: mealsData, error: mealsError } = await supabaseClient
+      .from('meals')
+      .select('name, ingredients, tolerance, date')
+      .eq('user_id', currentUserId)
+      .gte('date', prefix + '-01')
+      .lte('date', prefix + '-31');
+    genBtn.disabled = false;
+
+    const monthMeals = mealsError ? [] : (mealsData || []);
+
+    const daysCount = entries.length;
+    const avg = arr => daysCount === 0 ? '—' : (arr.reduce((s,v) => s+v, 0) / daysCount).toFixed(1);
+    const avgPainM = avg(entries.map(e => e.pain));
+    const avgFatigueM = avg(entries.map(e => e.fatigue));
+    const avgMoodM = avg(entries.map(e => e.mood));
+
+    const stoolEntries = entries.filter(e => typeof e.stoolCount === 'number');
+    const avgStool = stoolEntries.length === 0 ? '—' : (stoolEntries.reduce((s,e) => s+e.stoolCount, 0) / stoolEntries.length).toFixed(1);
+    const bristolCounts = { constipation: 0, normal: 0, diarrhee: 0 };
+    entries.forEach(e => { if (e.bristolKind) bristolCounts[e.bristolKind]++; });
+
+    const crises = entries.filter(e => (e.quickFlags || []).includes('sang') || (e.quickFlags || []).includes('urgence') || e.pain >= 8);
+
+    const tolMal = monthMeals.filter(m => m.tolerance === 'mal');
+    const tolBien = monthMeals.filter(m => m.tolerance === 'bien').length;
+    const tolNeutre = monthMeals.filter(m => m.tolerance === 'neutre').length;
+
+    const periodLabel = monthNames[month] + ' ' + year;
+    const genDate = new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+
+    let html = '';
+    html += '<div class="bilan-header-print">'
+      + '<div class="bilan-brand">'
+        + '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABfCAYAAAAXtMJAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAABQklEQVR4nO3aQQqCQBgF4L9RB2gTnaFj1AlaVptu0LqjRacIou4RQVAX6qKgIAoiSBTBRXHhCzFmYWaEP4Rk/ObpuIzMDxgAAJDsAeaAg4v2eaHqZoyIeoBUmGkuvygADhBODqAAtQAAAABJRU5ErkJggg==" alt="Ma Mici" class="bilan-logo">'
+        + '<div><h1>Ma Mici</h1><p class="bilan-tagline">Ton compagnon santé pour la MICI &middot; ma-mici.fr</p></div>'
+      + '</div>'
+      + '<h2 style="border:none; padding:0; margin:18px 0 4px;">Bilan de suivi mensuel</h2>'
+      + '<p>Période : ' + periodLabel + ' &middot; Généré le ' + genDate + '</p>'
+    + '</div>';
+
+    html += '<div class="bilan-section"><h3>Symptômes généraux</h3>';
+    if (daysCount === 0){
+      html += '<p class="bilan-empty">Aucune entrée de journal pour ce mois.</p>';
+    } else {
+      html += '<div class="bilan-stats-row">'
+        + '<div class="bilan-stat"><div class="val">' + daysCount + '</div><div class="lbl">Jours suivis</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + avgPainM + '</div><div class="lbl">Douleur moy.</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + avgFatigueM + '</div><div class="lbl">Fatigue moy.</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + avgMoodM + '</div><div class="lbl">Humeur moy.</div></div>'
+        + '</div>';
+    }
+    html += '</div>';
+
+    html += '<div class="bilan-section"><h3>Fréquence et type de selles</h3>';
+    if (daysCount === 0){
+      html += '<p class="bilan-empty">Aucune donnée pour ce mois.</p>';
+    } else {
+      html += '<div class="bilan-stats-row">'
+        + '<div class="bilan-stat"><div class="val">' + avgStool + '</div><div class="lbl">Selles / jour (moy.)</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + bristolCounts.constipation + '</div><div class="lbl">Jours type 1-2</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + bristolCounts.normal + '</div><div class="lbl">Jours type 3-4</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + bristolCounts.diarrhee + '</div><div class="lbl">Jours type 5-7</div></div>'
+        + '</div>';
+    }
+    html += '</div>';
+
+    html += '<div class="bilan-section"><h3>Crises (' + crises.length + ')</h3>';
+    if (crises.length === 0){
+      html += '<p class="bilan-empty">Aucune crise détectée ce mois-ci (sang, urgence/impériosité ou douleur intense).</p>';
+    } else {
+      html += '<ul class="bilan-list">' + crises.map(e => {
+        const d = new Date(e.date + 'T00:00:00');
+        const label = d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+        const flags = (e.quickFlags || []).map(quickFlagLabel);
+        if (e.pain >= 8 && !flags.length) flags.push('Douleur intense (' + e.pain + '/10)');
+        return '<li>' + escapeHtml(label) + (flags.length ? ' — ' + escapeHtml(flags.join(', ')) : '') + '</li>';
+      }).join('') + '</ul>';
+    }
+    html += '</div>';
+
+    html += '<div class="bilan-section"><h3>Tolérances alimentaires</h3>';
+    if (monthMeals.length === 0){
+      html += '<p class="bilan-empty">Aucun repas noté ce mois-ci.</p>';
+    } else {
+      html += '<div class="bilan-stats-row" style="grid-template-columns:repeat(3,1fr);">'
+        + '<div class="bilan-stat"><div class="val">' + tolBien + '</div><div class="lbl">Bien tolérés</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + tolNeutre + '</div><div class="lbl">Neutres</div></div>'
+        + '<div class="bilan-stat"><div class="val">' + tolMal.length + '</div><div class="lbl">Mal tolérés</div></div>'
+        + '</div>';
+      if (tolMal.length > 0){
+        html += '<p style="margin:14px 0 8px; font-weight:700; font-size:0.88rem;">Repas mal tolérés :</p>';
+        html += '<ul class="bilan-list">' + tolMal.map(m => {
+          const d = new Date(m.date + 'T00:00:00');
+          const label = d.toLocaleDateString('fr-FR', { day:'numeric', month:'long' });
+          return '<li>' + escapeHtml(label) + ' — ' + escapeHtml(m.name) + (m.ingredients ? ' (' + escapeHtml(m.ingredients) + ')' : '') + '</li>';
+        }).join('') + '</ul>';
+      }
+    }
+    html += '</div>';
+
+    html += '<div class="bilan-footer-print">Document généré automatiquement via <strong>Ma Mici</strong> (ma-mici.fr), l\u2019application compagnon des personnes atteintes de Crohn et de RCH. Cet outil ne remplace pas un avis médical.</div>';
+
+    document.getElementById('bilan-content').innerHTML = html;
+    document.getElementById('bilan-report').style.display = 'block';
+    document.getElementById('bilan-report').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  document.getElementById('bilan-print-btn').addEventListener('click', () => {
+    window.print();
+  });
 
 
 

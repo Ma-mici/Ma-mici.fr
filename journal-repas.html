@@ -491,19 +491,10 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  (async function(){
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    if (!session){
-      window.location.href = 'connexion.html';
-      return;
-    }
-
-    document.getElementById('logout-btn').addEventListener('click', async function(){
-      await supabaseClient.auth.signOut();
-      window.location.href = 'connexion.html';
-    });
-  })();
+  document.getElementById('logout-btn').addEventListener('click', async function(){
+    await supabaseClient.auth.signOut();
+    window.location.href = 'connexion.html';
+  });
 </script>
 
 
@@ -514,14 +505,21 @@
   function todayISO(){ const t = new Date(); return toISO(t.getFullYear(), t.getMonth(), t.getDate()); }
   function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-  let mealIdCounter = 1;
+  let currentUserId = null;
   let meals = [];
-  try {
-    meals = JSON.parse(localStorage.getItem('mamici_meals') || '[]');
-    mealIdCounter = meals.reduce((max, m) => Math.max(max, m.id), 0) + 1;
-  } catch(e){ meals = []; }
-  function saveMeals(){
-    try { localStorage.setItem('mamici_meals', JSON.stringify(meals)); } catch(e){}
+
+  function mapMealRow(r){
+    return { id: r.id, name: r.name, moment: r.moment, ingredients: r.ingredients || '', tolerance: r.tolerance, date: r.date, time: (r.heure || '').slice(0,5), note: r.note || '' };
+  }
+
+  async function loadMeals(){
+    const { data, error } = await supabaseClient
+      .from('meals')
+      .select('id, name, moment, ingredients, tolerance, date, heure, note')
+      .eq('user_id', currentUserId)
+      .order('date', { ascending: false });
+    if (error){ console.error(error); return; }
+    meals = (data || []).map(mapMealRow);
   }
 
   const mealList = document.getElementById('meal-list');
@@ -564,19 +562,36 @@
     });
   });
 
-  document.getElementById('meal-save').addEventListener('click', () => {
+  document.getElementById('meal-save').addEventListener('click', async () => {
     if (!mealName.value.trim() || !mealMoment.value){ mealError.style.display = 'block'; return; }
-    meals.push({
-      id: mealIdCounter++,
-      name: mealName.value.trim(),
-      moment: mealMoment.value,
-      ingredients: mealIngredients.value.trim(),
-      tolerance: selectedTolerance,
-      date: mealDate.value || todayISO(),
-      time: mealTime.value,
-      note: mealNote.value.trim()
-    });
-    saveMeals();
+
+    const saveBtn = document.getElementById('meal-save');
+    saveBtn.disabled = true;
+
+    const { data, error } = await supabaseClient
+      .from('meals')
+      .insert({
+        user_id: currentUserId,
+        name: mealName.value.trim(),
+        moment: mealMoment.value,
+        ingredients: mealIngredients.value.trim(),
+        tolerance: selectedTolerance,
+        date: mealDate.value || todayISO(),
+        heure: mealTime.value || null,
+        note: mealNote.value.trim()
+      })
+      .select('id, name, moment, ingredients, tolerance, date, heure, note')
+      .single();
+
+    saveBtn.disabled = false;
+
+    if (error){
+      mealError.textContent = "Impossible d'enregistrer : " + error.message;
+      mealError.style.display = 'block';
+      return;
+    }
+
+    meals.push(mapMealRow(data));
     closeMealModal();
     renderMeals();
   });
@@ -622,15 +637,25 @@
     });
     mealList.innerHTML = html;
     mealList.querySelectorAll('.meal-remove').forEach(btn => {
-      btn.addEventListener('click', () => {
-        meals = meals.filter(m => m.id !== Number(btn.dataset.id));
-        saveMeals();
+      btn.addEventListener('click', async () => {
+        const { error } = await supabaseClient.from('meals').delete().eq('id', btn.dataset.id);
+        if (error){ console.error(error); return; }
+        meals = meals.filter(m => m.id !== btn.dataset.id);
         renderMeals();
       });
     });
   }
 
-  renderMeals();
+  (async function init(){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session){
+      window.location.href = 'connexion.html';
+      return;
+    }
+    currentUserId = session.user.id;
+    await loadMeals();
+    renderMeals();
+  })();
 </script>
 
 </body>
