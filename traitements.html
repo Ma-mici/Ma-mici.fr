@@ -183,6 +183,9 @@
   .panel-card h2{ font-size:1.3rem; margin-bottom:22px; text-align:center; }
   .panel-card-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:20px; }
   .panel-card-head .btn{ padding:11px 20px; font-size:0.88rem; flex-shrink:0; }
+  .mode-toggle{ display:flex; background:var(--bg-flat); border-radius:100px; padding:4px; margin-bottom:18px; }
+  .mode-toggle-btn{ flex:1; border:none; border-radius:100px; padding:10px; font-size:0.82rem; font-weight:700; cursor:pointer; background:transparent; color:var(--ink-soft); font-family:inherit; transition:all .15s ease; }
+  .mode-toggle-btn.active{ background:var(--violet-500); color:var(--white); }
 
   /* ---------- Calendrier ---------- */
   .rdv-layout{ display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start; margin-bottom:24px; }
@@ -527,18 +530,26 @@
       <p>Gère les médicaments et compléments que tu prends actuellement</p>
     </div>
 
-<!-- ============== ONGLET MES TRAITEMENTS ============== -->
+<!-- ============== MES TRAITEMENTS ============== -->
     <section class="tab-panel active">
       <div class="panel-card">
         <div class="panel-card-head">
-          <h2 style="margin-bottom:0; text-align:left;">Mes traitements actuels</h2>
-          <button type="button" class="btn btn-primary" id="med-add-open-btn">+ Ajouter un traitement</button>
+          <h2 style="margin-bottom:0; text-align:left;">Mes traitements</h2>
+          <button type="button" class="btn btn-primary" id="tx-add-open-btn">+ Ajouter un traitement</button>
         </div>
         <div class="tx-disclaimer">
           <span class="icon">ℹ️</span>
           <p>Cette liste sert uniquement à ton suivi personnel. Elle ne remplace pas une prescription médicale : seul ton médecin décide du traitement adapté à ta situation. Ne modifie jamais ton traitement sans son avis.</p>
         </div>
-        <div class="my-tx-list" id="my-tx-list"></div>
+        <div class="my-tx-list" id="tx-list"></div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-card-head">
+          <h2 style="margin-bottom:0; text-align:left;">Mes compléments</h2>
+          <button type="button" class="btn btn-primary" id="comp-add-open-btn">+ Ajouter un complément</button>
+        </div>
+        <div class="my-tx-list" id="comp-list"></div>
       </div>
     </section>
 
@@ -548,41 +559,60 @@
 <div class="modal-overlay" id="med-modal">
   <div class="modal-box">
     <div class="modal-head">
-      <h3>Ajouter un traitement</h3>
+      <h3 id="med-modal-title">Nouveau traitement</h3>
       <button type="button" class="modal-close" id="med-close" aria-label="Fermer">×</button>
     </div>
-    <p class="modal-sub" style="text-transform:none;">Choisis ton traitement et les informations de prise.</p>
 
-    <div class="form-row">
-      <label for="med-category-select">Catégorie</label>
-      <select id="med-category-select"></select>
+    <div class="mode-toggle" id="mode-toggle">
+      <button type="button" class="mode-toggle-btn active" data-mode="liste">Depuis la liste</button>
+      <button type="button" class="mode-toggle-btn" id="mode-autre-btn" data-mode="autre">Autre traitement</button>
+    </div>
+
+    <div id="mode-liste">
+      <div class="form-row">
+        <label for="med-category-select">Catégorie</label>
+        <select id="med-category-select"></select>
+      </div>
+      <div class="form-row">
+        <label for="med-name-select">Médicament</label>
+        <select id="med-name-select"></select>
+      </div>
+      <div class="form-row">
+        <label for="med-frequency">Fréquence de prise</label>
+        <select id="med-frequency">
+          <option value="">Choisir une fréquence...</option>
+          <option>Tous les jours</option>
+          <option>Deux fois par jour</option>
+          <option>Une fois par semaine</option>
+          <option>Toutes les 2 semaines</option>
+          <option>Toutes les 4 semaines</option>
+          <option>Toutes les 6 semaines</option>
+          <option>Toutes les 8 semaines</option>
+          <option>En perfusion à l'hôpital</option>
+          <option>Au besoin (poussées uniquement)</option>
+          <option>Autre</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="mode-autre" style="display:none;">
+      <div class="form-row">
+        <label for="med-autre-nom" id="med-autre-nom-label">Nom du traitement</label>
+        <input type="text" id="med-autre-nom" placeholder="Ex : Curcumine">
+      </div>
+      <div class="form-row">
+        <label for="med-autre-usage">À quoi ça sert (rappel personnel)</label>
+        <input type="text" id="med-autre-usage" placeholder="Ex : anti-inflammatoire naturel">
+      </div>
+      <div class="form-row">
+        <label for="med-autre-freq">Combien de fois par jour</label>
+        <input type="text" id="med-autre-freq" placeholder="Ex : 2 fois par jour">
+      </div>
     </div>
 
     <div class="form-row">
-      <label for="med-name-select">Médicament</label>
-      <select id="med-name-select"></select>
-    </div>
-
-    <div class="form-row">
-      <label for="med-dosage">Dosage</label>
+      <label for="med-dosage">Dosage / grammage</label>
       <input type="text" id="med-dosage" placeholder="Ex : 40 mg, 2 comprimés...">
-    </div>
-
-    <div class="form-row">
-      <label for="med-frequency">Fréquence de prise</label>
-      <select id="med-frequency">
-        <option value="">Choisir une fréquence...</option>
-        <option>Tous les jours</option>
-        <option>Deux fois par jour</option>
-        <option>Une fois par semaine</option>
-        <option>Toutes les 2 semaines</option>
-        <option>Toutes les 4 semaines</option>
-        <option>Toutes les 6 semaines</option>
-        <option>Toutes les 8 semaines</option>
-        <option>En perfusion à l'hôpital</option>
-        <option>Au besoin (poussées uniquement)</option>
-        <option>Autre</option>
-      </select>
     </div>
 
     <div class="form-row">
@@ -600,7 +630,7 @@
       <textarea id="med-side-effects" rows="2" placeholder="Ex : nausées légères les premiers jours"></textarea>
     </div>
 
-    <span class="modal-error" id="med-error" style="display:none;">Merci de choisir une fréquence de prise.</span>
+    <span class="modal-error" id="med-error" style="display:none;">Merci de compléter les champs nécessaires.</span>
 
     <div class="modal-actions">
       <button type="button" class="btn btn-ghost" id="med-cancel">Annuler</button>
@@ -659,19 +689,10 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  (async function(){
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    if (!session){
-      window.location.href = 'connexion.html';
-      return;
-    }
-
-    document.getElementById('logout-btn').addEventListener('click', async function(){
-      await supabaseClient.auth.signOut();
-      window.location.href = 'connexion.html';
-    });
-  })();
+  document.getElementById('logout-btn').addEventListener('click', async function(){
+    await supabaseClient.auth.signOut();
+    window.location.href = 'connexion.html';
+  });
 </script>
 
 
@@ -759,26 +780,74 @@
       category: 'Traitements symptomatiques',
       meds: [
         { name: 'Lopéramide', brands: 'Imodium (au besoin)' },
-        { name: 'Antispasmodiques', brands: 'Spasfon, Duspatalin' },
-        { name: 'Compléments fer / vitamine B12 / vitamine D', brands: '' }
+        { name: 'Antispasmodiques', brands: 'Spasfon, Duspatalin' }
       ]
     }
   ];
 
-  let txIdCounter = 200;
-  let myTreatments = [];
+  const compCatalog = [
+    {
+      category: 'Vitamines',
+      meds: [
+        { name: 'Vitamine D3', brands: '' },
+        { name: 'Vitamine B12', brands: '' },
+        { name: 'Vitamine B9 (acide folique)', brands: '' },
+        { name: 'Vitamine K', brands: '' }
+      ]
+    },
+    {
+      category: 'Minéraux',
+      meds: [
+        { name: 'Fer', brands: 'Tardyferon, Ferrograd' },
+        { name: 'Calcium', brands: '' },
+        { name: 'Magnésium', brands: '' },
+        { name: 'Zinc', brands: '' }
+      ]
+    },
+    {
+      category: 'Probiotiques & digestion',
+      meds: [
+        { name: 'Probiotiques', brands: 'Ultra-Levure, Lactibiane' },
+        { name: 'Enzymes digestives', brands: '' }
+      ]
+    },
+    {
+      category: 'Acides gras & anti-inflammatoires naturels',
+      meds: [
+        { name: 'Oméga-3', brands: '' },
+        { name: 'Curcumine', brands: '' }
+      ]
+    },
+    {
+      category: 'Autres compléments',
+      meds: [
+        { name: 'Glutamine', brands: '' },
+        { name: 'Protéines en poudre', brands: '' }
+      ]
+    }
+  ];
 
-  const myTxList = document.getElementById('my-tx-list');
+  let currentUserId = null;
+  let currentAddType = 'traitement';
+  let currentMode = 'liste';
+  let treatments = [];
+  let complements = [];
+
+  const txList = document.getElementById('tx-list');
+  const compList = document.getElementById('comp-list');
   const medCategorySelect = document.getElementById('med-category-select');
   const medNameSelect = document.getElementById('med-name-select');
 
-  // Remplit le menu des catégories une seule fois
-  medCategorySelect.innerHTML = medCatalog.map((cat, ci) =>
-    '<option value="' + ci + '">' + cat.category + '</option>'
-  ).join('');
+  function activeCatalog(){ return currentAddType === 'complement' ? compCatalog : medCatalog; }
+
+  function renderCategoryOptions(){
+    medCategorySelect.innerHTML = activeCatalog().map((cat, ci) =>
+      '<option value="' + ci + '">' + cat.category + '</option>'
+    ).join('');
+  }
 
   function renderMedNameOptions(catIndex){
-    const meds = medCatalog[catIndex].meds;
+    const meds = activeCatalog()[catIndex].meds;
     medNameSelect.innerHTML = meds.map((med, mi) =>
       '<option value="' + mi + '">' + med.name + (med.brands ? ' (' + med.brands + ')' : '') + '</option>'
     ).join('');
@@ -786,9 +855,18 @@
 
   medCategorySelect.addEventListener('change', () => renderMedNameOptions(Number(medCategorySelect.value)));
 
-  document.getElementById('med-add-open-btn').addEventListener('click', openMedModal);
+  document.getElementById('tx-add-open-btn').addEventListener('click', () => openMedModal('traitement'));
+  document.getElementById('comp-add-open-btn').addEventListener('click', () => openMedModal('complement'));
 
   const medModal = document.getElementById('med-modal');
+  const medModalTitle = document.getElementById('med-modal-title');
+  const modeAutreBtn = document.getElementById('mode-autre-btn');
+  const modeListeBox = document.getElementById('mode-liste');
+  const modeAutreBox = document.getElementById('mode-autre');
+  const medAutreNomLabel = document.getElementById('med-autre-nom-label');
+  const medAutreNom = document.getElementById('med-autre-nom');
+  const medAutreUsage = document.getElementById('med-autre-usage');
+  const medAutreFreq = document.getElementById('med-autre-freq');
   const medDosage = document.getElementById('med-dosage');
   const medFrequency = document.getElementById('med-frequency');
   const medTime = document.getElementById('med-time');
@@ -796,13 +874,32 @@
   const medSideEffects = document.getElementById('med-side-effects');
   const medError = document.getElementById('med-error');
 
-  function openMedModal(){
-    medCategorySelect.value = '0';
+  function setMode(mode){
+    currentMode = mode;
+    document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.mode-toggle-btn[data-mode="' + mode + '"]').classList.add('active');
+    modeListeBox.style.display = mode === 'liste' ? 'block' : 'none';
+    modeAutreBox.style.display = mode === 'autre' ? 'block' : 'none';
+  }
+
+  document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
+
+  function openMedModal(type){
+    currentAddType = type;
+    const label = type === 'complement' ? 'complément' : 'traitement';
+    medModalTitle.textContent = 'Nouveau ' + label;
+    modeAutreBtn.textContent = 'Autre ' + label;
+    medAutreNomLabel.textContent = 'Nom du ' + label;
+
+    renderCategoryOptions();
     renderMedNameOptions(0);
-    medNameSelect.value = '0';
     medDosage.value = ''; medFrequency.value = ''; medTime.value = '';
     medStart.value = ''; medSideEffects.value = '';
+    medAutreNom.value = ''; medAutreUsage.value = ''; medAutreFreq.value = '';
     medError.style.display = 'none';
+    setMode('liste');
     medModal.classList.add('open');
   }
   function closeMedModal(){ medModal.classList.remove('open'); }
@@ -811,17 +908,64 @@
   document.getElementById('med-cancel').addEventListener('click', closeMedModal);
   medModal.addEventListener('click', (e) => { if (e.target === medModal) closeMedModal(); });
 
-  document.getElementById('med-save').addEventListener('click', () => {
-    if (!medFrequency.value){ medError.style.display = 'block'; return; }
-    const med = medCatalog[Number(medCategorySelect.value)].meds[Number(medNameSelect.value)];
-    myTreatments.push({
-      id: txIdCounter++, name: med.name, brands: med.brands,
-      dosage: medDosage.value.trim(), frequency: medFrequency.value,
-      time: medTime.value, start: medStart.value, sideEffects: medSideEffects.value.trim(),
-      lastTakenDate: null
-    });
+  function mapTxRow(r){
+    return {
+      id: r.id, type: r.type, name: r.nom, brands: r.marques, dosage: r.dosage, frequency: r.frequence,
+      time: (r.heure || '').slice(0,5), start: r.date_debut, sideEffects: r.effets_secondaires || '',
+      usageNote: r.usage_note || '', lastTakenDate: r.pris_le
+    };
+  }
+
+  async function loadTreatments(){
+    const { data, error } = await supabaseClient
+      .from('traitements')
+      .select('id, type, nom, marques, dosage, frequence, heure, date_debut, effets_secondaires, usage_note, pris_le')
+      .eq('user_id', currentUserId)
+      .order('created_at', { ascending: true });
+    if (error){ console.error(error); return; }
+    const rows = (data || []).map(mapTxRow);
+    treatments = rows.filter(r => r.type !== 'complement');
+    complements = rows.filter(r => r.type === 'complement');
+  }
+
+  document.getElementById('med-save').addEventListener('click', async () => {
+    let nom, marques, frequence, usageNote;
+
+    if (currentMode === 'liste'){
+      const med = activeCatalog()[Number(medCategorySelect.value)].meds[Number(medNameSelect.value)];
+      if (!medFrequency.value){ medError.textContent = 'Merci de choisir une fréquence de prise.'; medError.style.display = 'block'; return; }
+      nom = med.name; marques = med.brands; frequence = medFrequency.value; usageNote = '';
+    } else {
+      if (!medAutreNom.value.trim()){ medError.textContent = 'Merci d\u2019indiquer un nom.'; medError.style.display = 'block'; return; }
+      nom = medAutreNom.value.trim(); marques = ''; frequence = medAutreFreq.value.trim(); usageNote = medAutreUsage.value.trim();
+    }
+
+    const saveBtn = document.getElementById('med-save');
+    saveBtn.disabled = true;
+
+    const { data, error } = await supabaseClient
+      .from('traitements')
+      .insert({
+        user_id: currentUserId, type: currentAddType, nom: nom, marques: marques,
+        dosage: medDosage.value.trim(), frequence: frequence,
+        heure: medTime.value || null, date_debut: medStart.value || null,
+        effets_secondaires: medSideEffects.value.trim(), usage_note: usageNote
+      })
+      .select('id, type, nom, marques, dosage, frequence, heure, date_debut, effets_secondaires, usage_note, pris_le')
+      .single();
+
+    saveBtn.disabled = false;
+
+    if (error){
+      medError.textContent = "Impossible d'enregistrer : " + error.message;
+      medError.style.display = 'block';
+      return;
+    }
+
+    const row = mapTxRow(data);
+    if (row.type === 'complement') complements.push(row); else treatments.push(row);
     closeMedModal();
-    renderMyTreatments();
+    renderLists();
   });
 
   function formatFrDate(iso){
@@ -831,43 +975,69 @@
 
   function isTakenToday(t){ return t.lastTakenDate === todayISO(); }
 
-  function renderMyTreatments(){
-    if (myTreatments.length === 0){
-      myTxList.innerHTML = '<p class="empty-hint">Tu n' + String.fromCharCode(39) + 'as pas encore ajouté de traitement. Utilise le bouton ci-dessus pour ajouter celui que ton médecin t' + String.fromCharCode(39) + 'a prescrit.</p>';
+  function renderOneList(container, list, emptyMsg){
+    if (list.length === 0){
+      container.innerHTML = '<p class="empty-hint">' + emptyMsg + '</p>';
       return;
     }
     let html = '';
-    myTreatments.forEach(t => {
+    list.forEach(t => {
       let meta = [];
       if (t.time) meta.push('Pris à ' + t.time);
       if (t.start) meta.push('Depuis le ' + formatFrDate(t.start));
       const taken = isTakenToday(t);
       html += '<div class="tx-item' + (taken ? ' is-taken' : '') + '">'
-        + '<div class="tx-item-main"><h3>' + escapeHtml(t.name) + '</h3><p>' + (t.dosage ? escapeHtml(t.dosage) + ' · ' : '') + escapeHtml(t.brands || '') + '</p></div>'
-        + '<span class="tx-badge">' + escapeHtml(t.frequency) + '</span>'
+        + '<div class="tx-item-main"><h3>' + escapeHtml(t.name) + '</h3><p>' + (t.dosage ? escapeHtml(t.dosage) + ' · ' : '') + escapeHtml(t.brands || '') + '</p>'
+        + (t.usageNote ? '<p style="font-style:italic;">' + escapeHtml(t.usageNote) + '</p>' : '')
+        + '</div>'
+        + (t.frequency ? '<span class="tx-badge">' + escapeHtml(t.frequency) + '</span>' : '')
         + '<label class="upcoming-done-toggle"><input type="checkbox" data-taken-id="' + t.id + '"' + (taken ? ' checked' : '') + '> Pris aujourd\u2019hui</label>'
         + '<button type="button" class="tx-remove" data-id="' + t.id + '" aria-label="Retirer">✕</button>'
         + (meta.length ? '<div class="tx-item-meta">' + meta.map(escapeHtml).join(' · ') + '</div>' : '')
         + (t.sideEffects ? '<div class="tx-side-effects">Effets secondaires : ' + escapeHtml(t.sideEffects) + '</div>' : '')
         + '</div>';
     });
-    myTxList.innerHTML = html;
-    myTxList.querySelectorAll('.tx-remove').forEach(btn => {
-      btn.addEventListener('click', () => {
-        myTreatments = myTreatments.filter(t => t.id !== Number(btn.dataset.id));
-        renderMyTreatments();
+    container.innerHTML = html;
+    container.querySelectorAll('.tx-remove').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const { error } = await supabaseClient.from('traitements').delete().eq('id', btn.dataset.id);
+        if (error){ console.error(error); return; }
+        treatments = treatments.filter(t => t.id !== btn.dataset.id);
+        complements = complements.filter(t => t.id !== btn.dataset.id);
+        renderLists();
       });
     });
-    myTxList.querySelectorAll('input[data-taken-id]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const t = myTreatments.find(t => t.id === Number(cb.dataset.takenId));
-        if (t){ t.lastTakenDate = cb.checked ? todayISO() : null; }
-        renderMyTreatments();
+    container.querySelectorAll('input[data-taken-id]').forEach(cb => {
+      cb.addEventListener('change', async () => {
+        const all = treatments.concat(complements);
+        const t = all.find(t => t.id === cb.dataset.takenId);
+        if (t){
+          t.lastTakenDate = cb.checked ? todayISO() : null;
+          const { error } = await supabaseClient.from('traitements').update({ pris_le: t.lastTakenDate }).eq('id', t.id);
+          if (error){ console.error(error); }
+        }
+        renderLists();
       });
     });
   }
 
-  renderMyTreatments();
+  function renderLists(){
+    renderOneList(txList, treatments, 'Tu n' + String.fromCharCode(39) + 'as pas encore ajouté de traitement. Utilise le bouton ci-dessus pour ajouter celui que ton médecin t' + String.fromCharCode(39) + 'a prescrit.');
+    renderOneList(compList, complements, 'Tu n' + String.fromCharCode(39) + 'as pas encore ajouté de complément.');
+  }
+
+  (async function init(){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session){
+      window.location.href = 'connexion.html';
+      return;
+    }
+    currentUserId = session.user.id;
+    await loadTreatments();
+    renderLists();
+  })();
+
+
 
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ closeMedModal(); } });
 </script>
