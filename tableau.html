@@ -481,7 +481,7 @@
     // manuellement is_admin = true directement dans Supabase (jamais depuis le site).
     try {
       const { data: profile } = await supabaseClient
-        .from('profiles')
+        .from('Profiles')
         .select('is_admin')
         .eq('id', session.user.id)
         .single();

@@ -292,7 +292,7 @@
 
     // Vérifie que le compte connecté est bien marqué admin dans la table profiles
     const { data: myProfile } = await supabaseClient
-      .from('profiles')
+      .from('Profiles')
       .select('is_admin')
       .eq('id', session.user.id)
       .single();
@@ -306,7 +306,7 @@
 
     // Récupère tous les profils (nécessite la policy RLS admin, voir instructions)
     const { data: profiles, error } = await supabaseClient
-      .from('profiles')
+      .from('Profiles')
       .select('prenom, consent_sante, consent_newsletter, created_at, is_admin')
       .order('created_at', { ascending: false });
 
