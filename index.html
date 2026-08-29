@@ -134,6 +134,7 @@
 
   /* ---------- Features ---------- */
   .features-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:22px; }
+  .pays-grid{ grid-template-columns:repeat(3, 1fr); max-width:760px; margin:0 auto; }
   .feature-card{
     background:var(--white); border-radius:var(--radius-md); padding:30px 26px;
     border:1px solid var(--line); transition:transform .2s ease, box-shadow .2s ease;
@@ -357,7 +358,7 @@
       <h2>Disponible dans plusieurs pays</h2>
       <p>Ma Mici s'adapte aux repères et au système de santé de chaque pays.</p>
     </div>
-    <div class="features-grid" style="grid-template-columns:repeat(3, 1fr); max-width:760px; margin:0 auto;">
+    <div class="features-grid pays-grid">
       <div class="feature-card reveal" style="text-align:center;">
         <div class="feature-icon" style="background:var(--violet-100); margin-left:auto; margin-right:auto;">🇫🇷</div>
         <h3>France</h3>
