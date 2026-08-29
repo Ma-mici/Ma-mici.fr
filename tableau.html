@@ -159,6 +159,11 @@
     box-shadow:var(--shadow); border:1px solid var(--line); margin-bottom:32px;
   }
   .welcome-card h1{ font-size:clamp(1.6rem,3vw,2.1rem); margin-bottom:18px; text-align:center; }
+  #admin-badge{
+    display:inline-block; font-family:'Inter', sans-serif; font-size:0.7rem; font-weight:800;
+    text-transform:uppercase; letter-spacing:0.04em; color:var(--white); background:var(--violet-500);
+    padding:4px 10px; border-radius:100px; vertical-align:middle; margin-left:8px;
+  }
   .welcome-card > p{ font-size:1.02rem; text-align:center; max-width:640px; margin:0 auto 22px; }
   .welcome-card strong{ color:var(--ink); }
   .welcome-list{ max-width:620px; margin:0 auto 26px; }
@@ -328,7 +333,7 @@
   <div class="wrap">
 
     <div class="welcome-card">
-      <h1>Bienvenue sur Ma mici<span id="user-first-name"></span> !</h1>
+      <h1>Bienvenue sur Ma mici<span id="user-first-name"></span> !<span id="admin-badge" style="display:none;"> Admin</span></h1>
       <p><strong>Ma mici</strong> est ton application de référence pour mieux comprendre et gérer ton quotidien avec les <strong>MICI</strong> (Maladies Inflammatoires Chroniques de l'Intestin).</p>
 
       <p class="welcome-outro" style="margin-bottom:14px; font-weight:700; color:var(--ink); text-align:left; max-width:none;">Avec Ma mici, tu peux :</p>
@@ -471,6 +476,19 @@
 
     const prenom = (session.user.user_metadata && session.user.user_metadata.prenom) || '';
     document.getElementById('user-first-name').textContent = prenom ? ' 👋 ' + prenom : ' 👋';
+
+    // Badge Admin : lu depuis la table "profiles", réservé aux comptes marqués
+    // manuellement is_admin = true directement dans Supabase (jamais depuis le site).
+    try {
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', session.user.id)
+        .single();
+      if (profile && profile.is_admin){
+        document.getElementById('admin-badge').style.display = 'inline-block';
+      }
+    } catch(e){ /* pas grave si la colonne n'existe pas encore */ }
 
     document.getElementById('logout-btn').addEventListener('click', async function(){
       await supabaseClient.auth.signOut();
