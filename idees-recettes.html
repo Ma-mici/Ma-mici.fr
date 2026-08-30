@@ -166,6 +166,22 @@
   }
   .tab-empty h2{ font-size:1.2rem; margin-bottom:10px; text-align:center; }
   .tab-empty p{ max-width:420px; margin:0 auto; }
+
+  #profile-summary-card{ padding:20px 26px; }
+  #profile-summary-text{ font-size:0.92rem; text-align:center; }
+  #profile-summary-text a{ color:var(--violet-700); font-weight:700; text-decoration:underline; }
+
+  .recettes-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+  .recette-card{ background:var(--bg-flat); border-radius:var(--radius-md); padding:22px 24px; }
+  .recette-moment{ font-size:0.74rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; color:var(--violet-700); margin-bottom:6px; }
+  .recette-card h3{ font-size:1.05rem; margin-bottom:8px; }
+  .recette-card p{ font-size:0.86rem; margin-bottom:12px; }
+  .recette-badges{ display:flex; gap:6px; flex-wrap:wrap; }
+  .recette-badge{ font-size:0.7rem; font-weight:700; padding:4px 10px; border-radius:100px; background:var(--mint-soft); color:#1F6B52; }
+
+  @media (max-width:700px){
+    .recettes-grid{ grid-template-columns:1fr; }
+  }
   @media (max-width:820px){ .panel-card{ padding:26px 20px; } }
 </style>
 </head>
@@ -274,12 +290,13 @@
       <p>Des idées de recettes adaptées à ta situation</p>
     </div>
 
+    <div class="panel-card" id="profile-summary-card">
+      <p id="profile-summary-text">Chargement de ton profil...</p>
+    </div>
+
     <div class="panel-card">
-      <div class="tab-empty">
-        <div class="icon-circle">🍲</div>
-        <h2>Bientôt disponible</h2>
-        <p>Des idées de recettes filtrées selon ta maladie (Crohn ou RCH), ta phase (crise ou rémission) et tes propres tolérances alimentaires arriveront prochainement.</p>
-      </div>
+      <h2 id="recettes-title">Recettes pour toi</h2>
+      <div id="recettes-grid" class="recettes-grid"></div>
     </div>
 
   </div>
@@ -334,6 +351,155 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+  const regimeLabels = { vegetarien: 'Végétarien', vegan: 'Vegan', sans_porc: 'Sans porc', sans_gluten: 'Sans gluten', sans_lactose: 'Sans lactose' };
+
+  // Catalogue de recettes classiques, classées par pays, avec phase / régimes / aliments sensibles
+  const recettes = [
+    // --- France ---
+    { nom: "Riz blanc, poulet et carottes fondantes", pays: "France", moment: "Déjeuner", desc: "Une base douce et digeste, idéale en période sensible.", phase: ['poussee','remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['riz_blanc','poulet','carotte'] },
+    { nom: "Compote de pommes maison sans sucre ajouté", pays: "France", moment: "Collation", desc: "Cuite, mixée, sans morceaux : parfaite en cas de sensibilité.", phase: ['poussee','remission'], regimes: ['vegetarien','vegan','sans_porc','sans_gluten','sans_lactose'], contient: ['compote_pomme'] },
+    { nom: "Purée de courgettes et pommes de terre", pays: "France", moment: "Dîner", desc: "Cuisson longue, texture lisse, très bien tolérée.", phase: ['poussee','remission'], regimes: ['vegetarien','sans_porc','sans_gluten'], contient: ['courgette','pomme_de_terre','beurre'] },
+    { nom: "Œufs brouillés et pain de mie grillé", pays: "France", moment: "Petit-déjeuner", desc: "Simple, rassasiant, facile à digérer.", phase: ['poussee','remission'], regimes: ['vegetarien','sans_porc'], contient: ['oeufs','pain_de_mie'] },
+    { nom: "Poisson vapeur, riz et haricots verts extra-fins", pays: "France", moment: "Dîner", desc: "Cuisson vapeur douce, très peu de résidus.", phase: ['poussee','remission'], regimes: ['sans_porc','sans_gluten','sans_lactose'], contient: ['cabillaud_morue','riz_blanc','haricots_verts'] },
+    { nom: "Bouillon de légumes filtré et vermicelles de riz", pays: "France", moment: "Dîner", desc: "Léger et réconfortant, sans morceaux durs à digérer.", phase: ['poussee','remission'], regimes: ['vegetarien','vegan','sans_porc','sans_gluten','sans_lactose'], contient: ['bouillon_legumes','vermicelles_riz'] },
+    { nom: "Blanquette de veau douce", pays: "France", moment: "Dîner", desc: "Un classique réconfortant, à réserver aux périodes plus calmes.", phase: ['remission'], regimes: ['sans_gluten'], contient: ['veau','carotte','creme_fraiche'] },
+    { nom: "Gratin dauphinois", pays: "France", moment: "Dîner", desc: "Pommes de terre fondantes à la crème, gourmand et régressif.", phase: ['remission'], regimes: ['vegetarien','sans_porc','sans_gluten'], contient: ['pomme_de_terre','creme_fraiche','lait_vache'] },
+    { nom: "Poulet basquaise", pays: "France", moment: "Dîner", desc: "Poivrons et tomates mijotés, à tester hors poussée.", phase: ['remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['poulet','poivron_rouge','poivron_vert','sauce_tomate','oignon'] },
+    { nom: "Yaourt nature et compote de fruits", pays: "France", moment: "Collation", desc: "Un encas simple, à adapter si tu évites les laitages.", phase: ['poussee','remission'], regimes: ['vegetarien','sans_porc','sans_gluten'], contient: ['yaourt','compote_pomme'] },
+    { nom: "Granola maison, flocons d'avoine et noisettes", pays: "France", moment: "Petit-déjeuner", desc: "Croquant et énergisant, riche en fibres.", phase: ['remission'], regimes: ['vegetarien','vegan','sans_porc','sans_lactose'], contient: ['noisettes','avoine'] },
+    { nom: "Pancakes au sarrasin et sirop d'érable", pays: "France", moment: "Petit-déjeuner", desc: "Naturellement sans gluten, moelleux et gourmand.", phase: ['remission'], regimes: ['vegetarien','vegan','sans_porc','sans_gluten','sans_lactose'], contient: ['sarrasin','sirop_erable'] },
+
+    // --- Belgique ---
+    { nom: "Waterzooi de poulet", pays: "Belgique", moment: "Dîner", desc: "Poulet mijoté à la crème avec carottes et poireaux.", phase: ['remission'], regimes: ['sans_gluten'], contient: ['poulet','carotte','poireau','creme_fraiche'] },
+    { nom: "Stoemp carottes et pommes de terre", pays: "Belgique", moment: "Dîner", desc: "Purée écrasée, réconfortante et bien cuite.", phase: ['poussee','remission'], regimes: ['vegetarien','sans_porc','sans_gluten'], contient: ['pomme_de_terre','carotte','beurre'] },
+    { nom: "Carbonnade flamande douce", pays: "Belgique", moment: "Dîner", desc: "Bœuf mijoté à la bière brune, à réserver aux jours calmes.", phase: ['remission'], regimes: [], contient: ['boeuf','biere_brune','oignon'] },
+    { nom: "Moules simples à la crème", pays: "Belgique", moment: "Dîner", desc: "Moules cuites à la crème et aux échalotes.", phase: ['remission'], regimes: ['sans_gluten'], contient: ['moules','creme_fraiche','echalote'] },
+
+    // --- Suisse ---
+    { nom: "Rösti maison", pays: "Suisse", moment: "Dîner", desc: "Pommes de terre râpées et dorées au beurre.", phase: ['remission'], regimes: ['vegetarien','sans_porc','sans_gluten'], contient: ['pomme_de_terre','beurre'] },
+    { nom: "Fondue au fromage", pays: "Suisse", moment: "Dîner", desc: "Un classique convivial, riche en fromage fondu.", phase: ['remission'], regimes: ['vegetarien','sans_porc'], contient: ['gruyere_suisse','vin_blanc','pain_blanc'] },
+    { nom: "Papet vaudois doux", pays: "Suisse", moment: "Dîner", desc: "Poireaux et pommes de terre mijotés.", phase: ['remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['poireau','pomme_de_terre','saucisse'] },
+
+    // --- Luxembourg ---
+    { nom: "Bouneschlupp (soupe de haricots verts)", pays: "Luxembourg", moment: "Dîner", desc: "Soupe traditionnelle aux haricots verts et pommes de terre.", phase: ['remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['haricots_verts','pomme_de_terre','oignon'] },
+    { nom: "Purée de fèves douce", pays: "Luxembourg", moment: "Déjeuner", desc: "Version simplifiée et mixée d'un plat traditionnel.", phase: ['remission'], regimes: ['vegetarien','vegan','sans_porc','sans_gluten','sans_lactose'], contient: ['feves'] },
+
+    // --- Québec ---
+    { nom: "Poutine maison", pays: "Québec", moment: "Dîner", desc: "Frites, fromage et sauce, un classique généreux.", phase: ['remission'], regimes: ['vegetarien','sans_porc'], contient: ['pomme_de_terre','fromage_pate_dure'] },
+    { nom: "Pâté chinois", pays: "Québec", moment: "Dîner", desc: "Bœuf haché, maïs et purée de pommes de terre en couches.", phase: ['remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['boeuf','mais','pomme_de_terre'] },
+    { nom: "Soupe aux pois cassés", pays: "Québec", moment: "Dîner", desc: "Soupe traditionnelle aux pois cassés et jambon.", phase: ['remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['pois_casses','jambon'] },
+    { nom: "Tourtière douce", pays: "Québec", moment: "Dîner", desc: "Tourte à la viande, version peu épicée.", phase: ['remission'], regimes: ['sans_lactose'], contient: ['porc','pomme_de_terre','pain_blanc'] },
+
+    // --- Italie ---
+    { nom: "Risotto aux champignons de Paris", pays: "Italie", moment: "Dîner", desc: "Crémeux et réconfortant, cuisson longue du riz.", phase: ['remission'], regimes: ['vegetarien','sans_porc','sans_gluten'], contient: ['riz_arborio','champignons_paris','beurre'] },
+    { nom: "Pâtes au pesto maison", pays: "Italie", moment: "Déjeuner", desc: "Basilic, pignons et parmesan, simple et parfumé.", phase: ['remission'], regimes: ['vegetarien'], contient: ['pates_classiques','basilic','pignons','parmesan'] },
+    { nom: "Escalope de poulet milanaise", pays: "Italie", moment: "Dîner", desc: "Panée et dorée, à réserver aux jours plus sereins.", phase: ['remission'], regimes: ['sans_porc','sans_lactose'], contient: ['poulet','pain_blanc'] },
+    { nom: "Minestrone doux", pays: "Italie", moment: "Dîner", desc: "Soupe de légumes et petites pâtes, réconfortante.", phase: ['remission'], regimes: ['vegetarien','sans_porc'], contient: ['haricots_blancs','carotte','pates_classiques'] },
+
+    // --- Mexique ---
+    { nom: "Guacamole doux", pays: "Mexique", moment: "Collation", desc: "Avocat écrasé, citron et tomate, simple et frais.", phase: ['remission'], regimes: ['vegetarien','vegan','sans_porc','sans_gluten','sans_lactose'], contient: ['avocat','citron','tomate_cuite'] },
+    { nom: "Tacos de poulet et riz", pays: "Mexique", moment: "Déjeuner", desc: "Version douce, sans excès d'épices.", phase: ['remission'], regimes: ['sans_lactose'], contient: ['poulet','riz_blanc'] },
+    { nom: "Quesadilla simple au fromage", pays: "Mexique", moment: "Déjeuner", desc: "Tortilla fondante au fromage, cuisson à la poêle.", phase: ['remission'], regimes: ['vegetarien','sans_porc'], contient: ['pain_blanc','fromage_pate_dure'] },
+
+    // --- Espagne ---
+    { nom: "Tortilla espagnole", pays: "Espagne", moment: "Déjeuner", desc: "Omelette aux pommes de terre fondantes.", phase: ['remission'], regimes: ['vegetarien','sans_porc','sans_gluten','sans_lactose'], contient: ['oeufs','pomme_de_terre','oignon'] },
+    { nom: "Paella de poulet douce", pays: "Espagne", moment: "Dîner", desc: "Riz safrané, poulet et légumes, version peu épicée.", phase: ['remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['riz_blanc','poulet','poivron_rouge'] },
+    { nom: "Pan con tomate", pays: "Espagne", moment: "Petit-déjeuner", desc: "Pain grillé, tomate fraîche râpée et huile d'olive.", phase: ['remission'], regimes: ['vegetarien','vegan','sans_porc','sans_lactose'], contient: ['pain_blanc','tomate_cerise','huile_olive'] },
+
+    // --- Inde ---
+    { nom: "Riz basmati et légumes vapeur", pays: "Inde", moment: "Déjeuner", desc: "Une base parfumée et légère.", phase: ['poussee','remission'], regimes: ['vegetarien','vegan','sans_porc','sans_gluten','sans_lactose'], contient: ['riz_basmati','carotte','courgette'] },
+    { nom: "Dahl de lentilles corail au curcuma", pays: "Inde", moment: "Dîner", desc: "Onctueux et parfumé, riche en légumineuses.", phase: ['remission'], regimes: ['vegetarien','vegan','sans_porc','sans_gluten','sans_lactose'], contient: ['lentilles_corail','curcuma','cumin'] },
+    { nom: "Curry de poulet doux", pays: "Inde", moment: "Dîner", desc: "Sauce parfumée, à tester hors période de crise.", phase: ['remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['poulet','curry'] },
+
+    // --- Japon ---
+    { nom: "Riz au saumon vapeur", pays: "Japon", moment: "Dîner", desc: "Cuisson douce, très digeste.", phase: ['poussee','remission'], regimes: ['sans_gluten','sans_lactose'], contient: ['riz_blanc','saumon'] },
+    { nom: "Soupe miso douce au tofu", pays: "Japon", moment: "Dîner", desc: "Légère et umami, tofu fondant.", phase: ['remission'], regimes: ['vegetarien','vegan','sans_porc','sans_lactose'], contient: ['miso_blanc','tofu'] },
+    { nom: "Riz sauté aux légumes et œuf", pays: "Japon", moment: "Dîner", desc: "Simple, coloré, cuisson rapide des légumes.", phase: ['poussee','remission'], regimes: ['vegetarien','sans_porc','sans_gluten','sans_lactose'], contient: ['riz_blanc','carotte','oeufs'] }
+  ];
+
+  const toleranceLabels = {
+    abricot: 'abricot', ail: 'ail', avocat: 'avocat', avoine: 'avoine', basilic: 'basilic', beurre: 'beurre',
+    boeuf: 'bœuf', bouillon_boeuf: 'bouillon de bœuf', bouillon_legumes: 'bouillon de légumes', boulgour: 'boulgour',
+    cabillaud_morue: 'cabillaud/morue', cannelle: 'cannelle', carotte: 'carotte', champignons_paris: 'champignons de Paris',
+    citron: 'citron', compote_pomme: 'compote de pomme', concombre: 'concombre', courgette: 'courgette',
+    couscous_semoule_roulee: 'couscous', creme_fraiche: 'crème fraîche', cumin: 'cumin', curcuma: 'curcuma', curry: 'curry',
+    feta: 'feta', haricots_blancs: 'haricots blancs', haricots_verts: 'haricots verts', lait_vache: 'lait de vache',
+    lentilles_corail: 'lentilles corail', menthe: 'menthe', merguez: 'merguez', miso_blanc: 'miso', noisettes: 'noisettes',
+    oeufs: 'œufs', oignon: 'oignon', olives: 'olives', pain_blanc: 'pain blanc', pain_de_mie: 'pain de mie',
+    parmesan: 'parmesan', pates_classiques: 'pâtes', persil: 'persil', pignons: 'pignons de pin', pois_chiches: 'pois chiches',
+    poivron_rouge: 'poivron rouge', poivron_vert: 'poivron vert', pomme_de_terre: 'pomme de terre', poulet: 'poulet',
+    riz_arborio: 'riz arborio', riz_basmati: 'riz basmati', riz_blanc: 'riz blanc', sarrasin: 'sarrasin',
+    sauce_tomate: 'sauce tomate', saumon: 'saumon', sirop_erable: 'sirop d\u2019érable', tahini: 'tahini', tofu: 'tofu',
+    tomate_cerise: 'tomate cerise', tomate_cuite: 'tomate cuite', veau: 'veau', vermicelles_riz: 'vermicelles de riz', yaourt: 'yaourt',
+    biere_brune: 'bière brune', echalote: 'échalote', feves: 'fèves', fromage_pate_dure: 'fromage à pâte dure',
+    gruyere_suisse: 'gruyère', huile_olive: "huile d'olive", jambon: 'jambon', mais: 'maïs', moules: 'moules',
+    poireau: 'poireau', pois_casses: 'pois cassés', porc: 'porc', saucisse: 'saucisse', vin_blanc: 'vin blanc'
+  };
+  const phaseLabels = { remission: 'en rémission', poussee: 'en poussée' };
+
+  function renderRecettes(profile){
+    const summaryEl = document.getElementById('profile-summary-text');
+    const gridEl = document.getElementById('recettes-grid');
+    const titleEl = document.getElementById('recettes-title');
+
+    const rawTolerances = (profile && profile.tolerances) || [];
+    const standardTolerances = rawTolerances.filter(t => !t.startsWith('autre:'));
+    const customTerms = rawTolerances
+      .filter(t => t.startsWith('autre:'))
+      .map(t => t.split(':').slice(2).join(':').trim())
+      .filter(Boolean);
+
+    if (!profile || (!profile.maladie && !profile.phase_actuelle)){
+      summaryEl.innerHTML = 'Complète ton profil (maladie, phase, préférences alimentaires) pour des suggestions vraiment personnalisées. <a href="monprofil.html">Aller sur mon profil</a>';
+    } else {
+      const bits = [];
+      if (profile.maladie) bits.push(profile.maladie === 'crohn' ? 'Crohn' : 'RCH');
+      if (profile.phase_actuelle) bits.push(phaseLabels[profile.phase_actuelle] || profile.phase_actuelle);
+      if (profile.regimes && profile.regimes.length) bits.push(profile.regimes.map(r => regimeLabels[r] || r).join(', '));
+      const tolWords = standardTolerances.map(t => toleranceLabels[t] || t).concat(customTerms);
+      if (tolWords.length) bits.push('sans ' + tolWords.join(', '));
+      summaryEl.innerHTML = 'D\u2019après ton profil : <strong>' + escapeHtml(bits.join(' · ')) + '</strong>. <a href="monprofil.html">Modifier mes préférences</a>'
+        + (customTerms.length ? '<br><span style="font-size:0.8rem;">Pour tes aliments personnalisés (' + escapeHtml(customTerms.join(', ')) + '), on exclut les recettes qui les mentionnent explicitement — une recherche approximative, pas garantie à 100%.</span>' : '');
+    }
+
+    const phase = profile ? profile.phase_actuelle : null;
+    const regimes = (profile && profile.regimes) || [];
+
+    const filtered = recettes.filter(r => {
+      if (phase && !r.phase.includes(phase)) return false;
+      for (const reg of regimes){
+        if (!r.regimes.includes(reg)) return false;
+      }
+      for (const tol of standardTolerances){
+        if (r.contient.includes(tol)) return false;
+      }
+      const texte = (r.nom + ' ' + r.desc).toLowerCase();
+      for (const term of customTerms){
+        if (term && texte.includes(term.toLowerCase())) return false;
+      }
+      return true;
+    });
+
+    titleEl.textContent = 'Recettes pour toi (' + filtered.length + ')';
+
+    if (filtered.length === 0){
+      gridEl.innerHTML = '<p class="empty-hint">Aucune recette ne correspond pour l\u2019instant à tous tes critères. Essaie d\u2019assouplir tes préférences depuis ton profil.</p>';
+      return;
+    }
+
+    gridEl.innerHTML = filtered.map(r => {
+      const badges = r.regimes.map(reg => '<span class="recette-badge">' + regimeLabels[reg] + '</span>').join('');
+      return '<div class="recette-card">'
+        + '<div class="recette-moment">' + escapeHtml(r.moment) + ' · ' + escapeHtml(r.pays) + '</div>'
+        + '<h3>' + escapeHtml(r.nom) + '</h3>'
+        + '<p>' + escapeHtml(r.desc) + '</p>'
+        + '<div class="recette-badges">' + badges + '</div>'
+        + '</div>';
+    }).join('');
+  }
+
   (async function(){
     const { data: { session } } = await supabaseClient.auth.getSession();
 
@@ -346,6 +512,14 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'connexion.html';
     });
+
+    const { data: profile } = await supabaseClient
+      .from('Profiles')
+      .select('maladie, phase_actuelle, regimes, tolerances')
+      .eq('id', session.user.id)
+      .single();
+
+    renderRecettes(profile);
   })();
 </script>
 
