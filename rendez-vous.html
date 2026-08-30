@@ -509,7 +509,7 @@
           <button type="button" class="mega-link mega-toggle">💬 Communauté <span class="caret">▾</span></button>
           <div class="mega-dropdown">
             <a href="communaute.html#forums">Forums par tranche d'âge</a>
-            <a href="communaute.html#salon-general">Salon général</a>
+            <a href="https://discord.gg/PLACEHOLDER" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="#5865F2" aria-hidden="true" style="flex-shrink:0;"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.245.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.955 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg><span>Rejoindre le Discord</span></a>
             <a href="communaute.html#parrainage">Parrainage</a>
             <a href="communaute.html#rencontres">Rencontres locales</a>
             <a href="communaute.html#culture">Coin culture & médias</a>
@@ -656,19 +656,10 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  (async function(){
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    if (!session){
-      window.location.href = 'connexion.html';
-      return;
-    }
-
-    document.getElementById('logout-btn').addEventListener('click', async function(){
-      await supabaseClient.auth.signOut();
-      window.location.href = 'connexion.html';
-    });
-  })();
+  document.getElementById('logout-btn').addEventListener('click', async function(){
+    await supabaseClient.auth.signOut();
+    window.location.href = 'connexion.html';
+  });
 </script>
 
 
@@ -696,11 +687,29 @@
   const now = new Date();
   let calYear = now.getFullYear();
   let calMonth = now.getMonth();
-  let apptIdCounter = 100;
+  let currentUserId = null;
   let appointments = [];
 
   const calGrid = document.getElementById('cal-grid');
   const calMonthLabel = document.getElementById('cal-month-label');
+
+  // Convertit une ligne de la table "rendezvous" au format utilisé par l'affichage
+  function mapRow(r){
+    return { id: r.id, date: r.date, time: (r.heure || '').slice(0,5), specialist: r.specialiste, note: r.note || '', done: !!r.done };
+  }
+
+  async function loadAppointments(){
+    const { data, error } = await supabaseClient
+      .from('rendezvous')
+      .select('id, date, heure, specialiste, note, done')
+      .eq('user_id', currentUserId)
+      .order('date', { ascending: true });
+    if (error){
+      console.error(error);
+      return;
+    }
+    appointments = (data || []).map(mapRow);
+  }
 
   function renderCalendar(){
     calMonthLabel.textContent = new Date(calYear, calMonth, 1)
@@ -762,6 +771,12 @@
   }
   function closeRdvModal(){ rdvModal.classList.remove('open'); }
 
+  async function deleteAppointment(id){
+    const { error } = await supabaseClient.from('rendezvous').delete().eq('id', id);
+    if (error){ console.error(error); return; }
+    appointments = appointments.filter(a => a.id !== id);
+  }
+
   function renderExisting(){
     const list = appointments.filter(a => a.date === selectedDateStr);
     if (list.length === 0){ existingBox.innerHTML = ''; return; }
@@ -772,8 +787,8 @@
     });
     existingBox.innerHTML = html;
     existingBox.querySelectorAll('button[data-id]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        appointments = appointments.filter(a => a.id !== Number(btn.dataset.id));
+      btn.addEventListener('click', async () => {
+        await deleteAppointment(btn.dataset.id);
         renderExisting(); renderCalendar(); renderUpcoming();
       });
     });
@@ -783,12 +798,30 @@
   document.getElementById('rdv-cancel').addEventListener('click', closeRdvModal);
   rdvModal.addEventListener('click', (e) => { if (e.target === rdvModal) closeRdvModal(); });
 
-  document.getElementById('rdv-save').addEventListener('click', () => {
+  document.getElementById('rdv-save').addEventListener('click', async () => {
     if (!rdvSpecialist.value || !rdvTime.value){ rdvError.style.display = 'block'; return; }
-    appointments.push({
-      id: apptIdCounter++, date: selectedDateStr,
-      specialist: rdvSpecialist.value, time: rdvTime.value, note: rdvNote.value.trim(), done: false
-    });
+
+    const saveBtn = document.getElementById('rdv-save');
+    saveBtn.disabled = true;
+
+    const { data, error } = await supabaseClient
+      .from('rendezvous')
+      .insert({
+        user_id: currentUserId, date: selectedDateStr,
+        heure: rdvTime.value, specialiste: rdvSpecialist.value, note: rdvNote.value.trim(), done: false
+      })
+      .select('id, date, heure, specialiste, note, done')
+      .single();
+
+    saveBtn.disabled = false;
+
+    if (error){
+      rdvError.textContent = "Impossible d'enregistrer : " + error.message;
+      rdvError.style.display = 'block';
+      return;
+    }
+
+    appointments.push(mapRow(data));
     closeRdvModal();
     renderCalendar();
     renderUpcoming();
@@ -826,15 +859,19 @@
     });
     upcomingList.innerHTML = html;
     upcomingList.querySelectorAll('button[data-id]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        appointments = appointments.filter(a => a.id !== Number(btn.dataset.id));
+      btn.addEventListener('click', async () => {
+        await deleteAppointment(btn.dataset.id);
         renderCalendar(); renderUpcoming();
       });
     });
     upcomingList.querySelectorAll('input[data-done-id]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const appt = appointments.find(a => a.id === Number(cb.dataset.doneId));
-        if (appt){ appt.done = cb.checked; }
+      cb.addEventListener('change', async () => {
+        const appt = appointments.find(a => a.id === cb.dataset.doneId);
+        if (appt){
+          appt.done = cb.checked;
+          const { error } = await supabaseClient.from('rendezvous').update({ done: cb.checked }).eq('id', appt.id);
+          if (error){ console.error(error); }
+        }
         renderUpcoming();
       });
     });
@@ -890,9 +927,17 @@
       + '<p class="reminder-tip">N\u2019oublie pas de préparer tes questions pour ton médecin 💜</p>';
   }
 
-  renderCalendar();
-  renderUpcoming();
-
+  (async function init(){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session){
+      window.location.href = 'connexion.html';
+      return;
+    }
+    currentUserId = session.user.id;
+    await loadAppointments();
+    renderCalendar();
+    renderUpcoming();
+  })();
 
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ closeRdvModal(); } });
 </script>
