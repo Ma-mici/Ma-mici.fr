@@ -166,6 +166,21 @@
   }
   .welcome-card > p{ font-size:1.02rem; text-align:center; max-width:640px; margin:0 auto 22px; }
   .welcome-card strong{ color:var(--ink); }
+  .panel-card{
+    background:var(--white); border-radius:var(--radius-lg); padding:40px 44px;
+    box-shadow:var(--shadow); border:1px solid var(--line);
+  }
+  .panel-card h2{ font-size:1.3rem; text-align:center; }
+  .stat-card{
+    background:var(--bg-flat); border-radius:var(--radius-md); padding:26px 22px; text-align:center;
+  }
+  .stat-card .stat-value{ font-family:'Baloo 2'; font-weight:800; font-size:2rem; color:var(--violet-700); line-height:1; margin-bottom:10px; }
+  .stat-card .stat-label{ font-size:0.9rem; color:var(--ink-soft); }
+  .stat-card .stat-note{ font-size:0.74rem; margin-top:8px; font-style:italic; color:var(--ink-soft); }
+  .stat-split{ display:flex; justify-content:center; gap:24px; margin-bottom:10px; }
+  .stat-split div{ text-align:center; }
+  .stat-split .stat-value{ font-size:1.6rem; margin-bottom:2px; }
+  .stat-split .stat-mini-label{ font-size:0.76rem; color:var(--ink-soft); }
   .welcome-list{ max-width:620px; margin:0 auto 26px; }
   .welcome-list li{ position:relative; padding-left:22px; margin-bottom:14px; font-size:0.98rem; color:var(--ink-soft); }
   .welcome-list li::before{
@@ -414,6 +429,21 @@
 
     </div>
 
+    <div class="panel-card" style="margin-top:24px;">
+      <h2 style="margin-bottom:6px;">La communauté en chiffres</h2>
+      <p style="text-align:center; margin-bottom:22px;">Des tendances anonymes et agrégées, calculées sur l'ensemble des membres — jamais sur une personne précise.</p>
+
+      <div id="stats-loading" style="text-align:center; padding:10px;">
+        <p>Chargement des statistiques...</p>
+      </div>
+
+      <div id="stats-empty" style="display:none; text-align:center; max-width:480px; margin:0 auto; padding:10px;">
+        <p>Ces statistiques se construisent au fur et à mesure que la communauté grandit. Reviens bientôt !</p>
+      </div>
+
+      <div id="stats-grid" style="display:none;"></div>
+    </div>
+
   </div>
 </main>
 
@@ -494,6 +524,76 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'connexion.html';
     });
+  })();
+
+  const phaseLabels = { remission: 'En rémission', poussee: 'En poussée' };
+
+  (async function loadCommunityStats(){
+    const loadingEl = document.getElementById('stats-loading');
+    const emptyEl = document.getElementById('stats-empty');
+    const gridEl = document.getElementById('stats-grid');
+
+    try {
+      const { data, error } = await supabaseClient.rpc('get_community_stats');
+      loadingEl.style.display = 'none';
+
+      if (error || !data){
+        emptyEl.style.display = 'block';
+        return;
+      }
+
+      let cards = '';
+
+      if (data.crohn_pct !== null && data.rch_pct !== null){
+        cards += '<div class="stat-card">'
+          + '<div class="stat-split">'
+            + '<div><div class="stat-value">' + data.crohn_pct + '%</div><div class="stat-mini-label">Crohn</div></div>'
+            + '<div><div class="stat-value">' + data.rch_pct + '%</div><div class="stat-mini-label">RCH</div></div>'
+          + '</div>'
+          + '<div class="stat-label">Répartition des membres par maladie</div>'
+        + '</div>';
+      }
+
+      if (data.bio_pct !== null){
+        cards += '<div class="stat-card">'
+          + '<div class="stat-value">' + data.bio_pct + '%</div>'
+          + '<div class="stat-label">des membres suivent un traitement biologique (anti-TNF, etc.)</div>'
+        + '</div>';
+      }
+
+      if (data.phase_stats && data.phase_stats.length > 0){
+        data.phase_stats.forEach(p => {
+          cards += '<div class="stat-card">'
+            + '<div class="stat-value">' + p.avg_fatigue + '/10</div>'
+            + '<div class="stat-label">Fatigue moyenne — ' + (phaseLabels[p.phase] || p.phase) + '</div>'
+          + '</div>';
+        });
+      }
+
+      if (data.treatment_stats && data.treatment_stats.length > 0){
+        data.treatment_stats.forEach(t => {
+          cards += '<div class="stat-card">'
+            + '<div class="stat-value">' + t.avg_fatigue + '/10</div>'
+            + '<div class="stat-label">Fatigue moyenne sous ' + t.nom + '</div>'
+            + '<div class="stat-note">Basé sur ' + t.n + ' membres</div>'
+          + '</div>';
+        });
+      }
+
+      if (!cards){
+        emptyEl.style.display = 'block';
+        return;
+      }
+
+      gridEl.innerHTML = cards;
+      gridEl.style.display = 'grid';
+      gridEl.style.gridTemplateColumns = 'repeat(auto-fit, minmax(220px, 1fr))';
+      gridEl.style.gap = '18px';
+
+    } catch (e){
+      loadingEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+    }
   })();
 </script>
 
