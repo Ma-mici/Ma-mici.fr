@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Coloscopie — Ma Mici</title>
-<meta name="description" content="Prépare et suis tes coloscopies.">
+<meta name="description" content="Prépare et suis tes coloscopies : dates, préparation, comptes-rendus.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -218,6 +218,10 @@
   /* Rendez-vous à venir */
   .upcoming-list{ display:flex; flex-direction:column; gap:12px; }
   .upcoming-item{ display:flex; align-items:center; gap:16px; padding:14px 16px; background:var(--bg-flat); border-radius:var(--radius-md); flex-wrap:wrap; }
+  .upcoming-item.is-done{ opacity:0.6; }
+  .upcoming-item.is-done .upcoming-info h3{ text-decoration:line-through; }
+  .upcoming-done-toggle{ display:flex; align-items:center; gap:6px; font-size:0.82rem; font-weight:600; color:var(--ink-soft); cursor:pointer; white-space:nowrap; }
+  .upcoming-done-toggle input{ accent-color:var(--mint); width:16px; height:16px; cursor:pointer; }
   .upcoming-date{ width:56px; flex-shrink:0; text-align:center; background:var(--white); border-radius:12px; padding:8px 4px; }
   .upcoming-date .d{ font-family:'Baloo 2'; font-size:1.15rem; font-weight:700; line-height:1; }
   .upcoming-date .m{ font-size:0.68rem; text-transform:uppercase; color:var(--ink-soft); font-weight:700; }
@@ -418,6 +422,23 @@
     .tab-btn{ padding:11px 15px; font-size:0.84rem; }
   }
 </style>
+
+<style>
+  .guide-section{ margin-bottom:24px; }
+  .guide-section:last-child{ margin-bottom:0; }
+  .guide-section h3{ font-size:1rem; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .guide-section ul{ padding-left:20px; list-style:disc; }
+  .guide-section li{ margin-bottom:6px; font-size:0.92rem; color:var(--ink-soft); line-height:1.6; }
+  .guide-badge{
+    display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px;
+    border-radius:50%; background:var(--violet-100); font-size:0.8rem; flex-shrink:0;
+  }
+  .guide-mici-box{ background:var(--violet-100); border-radius:var(--radius-md); padding:16px 18px; margin-top:6px; }
+  .guide-mici-box p{ font-size:0.88rem; color:var(--ink); margin-bottom:6px; }
+  .guide-mici-box p:last-child{ margin-bottom:0; }
+  .compte-rendu-box{ background:var(--bg-flat); border-radius:12px; padding:10px 12px; margin-top:8px; font-size:0.85rem; font-style:italic; width:100%; }
+  .cr-btn{ font-size:0.78rem; font-weight:700; color:var(--violet-700); text-decoration:underline; background:none; border:none; cursor:pointer; padding:0; }
+</style>
 </head>
 <body>
 
@@ -524,20 +545,146 @@
       <p>Prépare et suis tes coloscopies</p>
     </div>
 
-<!-- ============== ONGLET COLOSCOPIE ============== -->
-    <section class="tab-panel active">
+    <div class="rdv-layout">
       <div class="panel-card">
-        <div class="tab-empty">
-          <div class="icon-circle" style="background:var(--mint-soft);">🔬</div>
-          <h2>Bientôt disponible</h2>
-          <p>Le suivi dédié à tes coloscopies (dates, préparation, comptes-rendus) sera ajouté dans une prochaine mise à jour.</p>
+        <h2>Calendrier des coloscopies</h2>
+        <div class="cal-nav">
+          <button type="button" class="cal-nav-btn" id="cal-prev" aria-label="Mois précédent">‹</button>
+          <span class="cal-month-label" id="cal-month-label"></span>
+          <button type="button" class="cal-nav-btn" id="cal-next" aria-label="Mois suivant">›</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+
+      <div class="reminder-card" id="reminder-card"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Tes coloscopies</h2>
+      <div class="upcoming-list" id="upcoming-list"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Comment bien préparer ta coloscopie</h2>
+
+      <div class="guide-section">
+        <h3><span class="guide-badge">🗓️</span> 5 à 7 jours avant</h3>
+        <ul>
+          <li>Adopte un <strong>régime pauvre en résidus</strong> : évite les fruits et légumes crus, les légumineuses, les céréales complètes, les graines et les fruits à coque.</li>
+          <li>Préviens ton gastro-entérologue de <strong>tous tes traitements en cours</strong> (biothérapies, immunosuppresseurs, corticoïdes, anticoagulants) : certains peuvent nécessiter un ajustement avant l'examen, uniquement sur ses conseils.</li>
+          <li>Note tes questions pour le médecin (raison de l'examen, biopsies prévues, résultats attendus).</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h3><span class="guide-badge">🍵</span> La veille de l'examen</h3>
+        <ul>
+          <li>Passe à un <strong>régime liquide clair</strong> : bouillon filtré, eau, thé ou café sans lait, jus de fruits sans pulpe. Évite tout ce qui est rouge ou violet (ça peut fausser la lecture de l'examen).</li>
+          <li>Prends la préparation (solution laxative) <strong>exactement comme prescrite par ton médecin ou ton pharmacien</strong> — le produit, la quantité et les horaires varient selon les personnes, il n'y a pas de protocole universel.</li>
+          <li>Reste à proximité de toilettes et bois bien pour éviter la déshydratation.</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h3><span class="guide-badge">📋</span> Le jour de l'examen</h3>
+        <ul>
+          <li>Reste <strong>à jeun</strong> à partir de l'heure indiquée par l'équipe médicale.</li>
+          <li>Prévois un <strong>accompagnateur</strong> pour te ramener si une sédation est prévue (tu ne pourras pas conduire).</li>
+          <li>Apporte ta carte Vitale, ton ordonnance, la liste de tes traitements et tes derniers comptes-rendus.</li>
+          <li>Porte des vêtements confortables, faciles à enlever.</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h3><span class="guide-badge">💜</span> Spécificités MICI</h3>
+        <div class="guide-mici-box">
+          <p>Chez les personnes atteintes de Crohn ou de RCH, la coloscopie sert souvent à <strong>évaluer l'inflammation</strong>, pas seulement à chercher des lésions : des <strong>biopsies systématiques</strong> sont fréquemment réalisées, même sur une muqueuse qui semble normale.</p>
+          <p>Un score endoscopique peut être utilisé pour objectiver l'activité de la maladie (par exemple le score de Mayo pour la RCH, ou le SES-CD pour le Crohn).</p>
+          <p>En cas de poussée sévère, l'examen peut être adapté (rectosigmoïdoscopie limitée plutôt qu'une coloscopie complète) pour limiter les risques — c'est une décision médicale au cas par cas.</p>
         </div>
       </div>
-    </section>
+
+      <div class="guide-section">
+        <h3><span class="guide-badge">🛌</span> Après l'examen</h3>
+        <ul>
+          <li>Repose-toi le reste de la journée, surtout en cas de sédation.</li>
+          <li>Des ballonnements ou petits gaz sont normaux dans les heures qui suivent.</li>
+          <li>Reprends une alimentation normale progressivement, selon les conseils de l'équipe médicale.</li>
+          <li>Les résultats des biopsies arrivent généralement sous <strong>1 à 2 semaines</strong> — pense à les noter ici une fois reçus.</li>
+        </ul>
+      </div>
+
+      <p style="font-size:0.82rem; font-style:italic; margin-top:20px; text-align:center;">Ce guide est informatif et général : le protocole exact (produit, quantités, horaires, ajustement des traitements) est toujours décidé par ton médecin, selon ta situation.</p>
+    </div>
 
   </div>
 </main>
 
+<div class="modal-overlay" id="colo-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Nouvelle coloscopie</h3>
+      <button type="button" class="modal-close" id="colo-close" aria-label="Fermer">×</button>
+    </div>
+    <p class="modal-sub" id="colo-date-label"></p>
+
+    <div class="form-row">
+      <label for="colo-time">Heure (optionnel)</label>
+      <input type="time" id="colo-time">
+    </div>
+
+    <div class="form-row">
+      <label for="colo-lieu">Lieu (optionnel)</label>
+      <input type="text" id="colo-lieu" placeholder="Ex : Clinique du Parc">
+    </div>
+
+    <div class="form-row">
+      <label for="colo-medecin">Médecin (optionnel)</label>
+      <input type="text" id="colo-medecin" placeholder="Ex : Dr Martin">
+    </div>
+
+    <div class="form-row">
+      <label for="colo-prep">Préparation prescrite (optionnel)</label>
+      <input type="text" id="colo-prep" placeholder="Ex : Moviprep, Colokit...">
+    </div>
+
+    <div class="form-row">
+      <label for="colo-note">Note (optionnel)</label>
+      <textarea id="colo-note" rows="2" placeholder="Ex : biopsies prévues"></textarea>
+    </div>
+
+    <span class="modal-error" id="colo-error" style="display:none;">Une erreur est survenue.</span>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="colo-cancel">Annuler</button>
+      <button type="button" class="btn btn-primary" id="colo-save">Enregistrer</button>
+    </div>
+
+    <div class="existing-box" id="existing-box"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cr-modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Compte-rendu</h3>
+      <button type="button" class="modal-close" id="cr-close" aria-label="Fermer">×</button>
+    </div>
+    <div class="form-row">
+      <label for="cr-text">Résultats / observations</label>
+      <textarea id="cr-text" rows="5" placeholder="Ex : score de Mayo 1, biopsies en attente, muqueuse peu inflammatoire..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="cr-cancel">Annuler</button>
+      <button type="button" class="btn btn-primary" id="cr-save">Enregistrer le compte-rendu</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-check">✓</span>
+  <span class="toast-text" id="toast-text">Coloscopie enregistrée</span>
+</div>
 
 
 <footer>
@@ -584,26 +731,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-  // --- Configuration Supabase (mêmes identifiants que connexion.html / creer-compte.html) ---
   const SUPABASE_URL = 'https://kuuvsijfaotfuerkltax.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt1dXZzaWpmYW90ZnVlcmtsdGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTA5ODQsImV4cCI6MjEwMzAyNjk4NH0.v5v14wElfXnLZoVTDwGqjMpEW2MFdOD3HH8YskKR4_s';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  (async function(){
-    const { data: { session } } = await supabaseClient.auth.getSession();
-
-    if (!session){
-      window.location.href = 'connexion.html';
-      return;
-    }
-
-    document.getElementById('logout-btn').addEventListener('click', async function(){
-      await supabaseClient.auth.signOut();
-      window.location.href = 'connexion.html';
-    });
-  })();
+  document.getElementById('logout-btn').addEventListener('click', async function(){
+    await supabaseClient.auth.signOut();
+    window.location.href = 'connexion.html';
+  });
 </script>
-
 
 
 <script>
@@ -612,7 +748,7 @@
   function todayISO(){ const t = new Date(); return toISO(t.getFullYear(), t.getMonth(), t.getDate()); }
   function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
-  const MASCOT_DOCTOR = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABfCAYAAAAXtMJAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAABQklEQVR4nO3aQQqCQBgF4L9RB2gTnaFj1AlaVptu0LqjRacIou4RQVAX6qKgIAoiSBTBRXHhCzFmYWaEP4Rk/ObpuIzMDxgAAJDsAeaAg4v2eaHqZoyIeoBUmGkuvygADhBODqAAtQAAAABJRU5ErkJggg==';
+  const MASCOT_COLO = 'mascotte-coloscopie.png';
 
   const toastEl = document.getElementById('toast');
   const toastTextEl = document.getElementById('toast-text');
@@ -624,11 +760,283 @@
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
   }
 
+  const now = new Date();
+  let calYear = now.getFullYear();
+  let calMonth = now.getMonth();
+  let currentUserId = null;
+  let coloscopies = [];
 
+  const calGrid = document.getElementById('cal-grid');
+  const calMonthLabel = document.getElementById('cal-month-label');
 
+  function mapRow(r){
+    return {
+      id: r.id, date: r.date, time: (r.heure || '').slice(0,5), lieu: r.lieu || '',
+      medecin: r.medecin || '', preparation: r.preparation || '', note: r.note || '',
+      compteRendu: r.compte_rendu || '', done: !!r.done
+    };
+  }
 
+  async function loadColoscopies(){
+    const { data, error } = await supabaseClient
+      .from('coloscopies')
+      .select('id, date, heure, lieu, medecin, preparation, note, compte_rendu, done')
+      .eq('user_id', currentUserId)
+      .order('date', { ascending: true });
+    if (error){ console.error(error); return; }
+    coloscopies = (data || []).map(mapRow);
+  }
 
+  function renderCalendar(){
+    calMonthLabel.textContent = new Date(calYear, calMonth, 1)
+      .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+      .toUpperCase();
+
+    const firstDayIdx = (new Date(calYear, calMonth, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const today = todayISO();
+
+    let html = '';
+    ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => html += '<div class="cal-weekday">' + d + '</div>');
+    for (let i = 0; i < firstDayIdx; i++) html += '<div class="cal-day cal-empty"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++){
+      const dateStr = toISO(calYear, calMonth, d);
+      const dow = (firstDayIdx + d - 1) % 7;
+      const isWeekend = dow === 5 || dow === 6;
+      const isToday = dateStr === today;
+      const hasColo = coloscopies.some(a => a.date === dateStr);
+      html += '<div class="cal-day' + (isWeekend ? ' weekend' : '') + (isToday ? ' today' : '') + '" data-date="' + dateStr + '">'
+        + d + (hasColo ? '<span class="dot"></span>' : '') + '</div>';
+    }
+    calGrid.innerHTML = html;
+    calGrid.querySelectorAll('.cal-day:not(.cal-empty)').forEach(el => {
+      el.addEventListener('click', () => openColoModal(el.dataset.date));
+    });
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    calMonth--; if (calMonth < 0){ calMonth = 11; calYear--; }
+    renderCalendar();
+  });
+  document.getElementById('cal-next').addEventListener('click', () => {
+    calMonth++; if (calMonth > 11){ calMonth = 0; calYear++; }
+    renderCalendar();
+  });
+
+  const coloModal = document.getElementById('colo-modal');
+  const coloDateLabel = document.getElementById('colo-date-label');
+  const coloTime = document.getElementById('colo-time');
+  const coloLieu = document.getElementById('colo-lieu');
+  const coloMedecin = document.getElementById('colo-medecin');
+  const coloPrep = document.getElementById('colo-prep');
+  const coloNote = document.getElementById('colo-note');
+  const coloError = document.getElementById('colo-error');
+  const existingBox = document.getElementById('existing-box');
+  let selectedDateStr = null;
+
+  function openColoModal(dateStr){
+    selectedDateStr = dateStr;
+    const d = new Date(dateStr + 'T00:00:00');
+    coloDateLabel.textContent = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    coloTime.value = ''; coloLieu.value = ''; coloMedecin.value = ''; coloPrep.value = ''; coloNote.value = '';
+    coloError.style.display = 'none';
+    renderExisting();
+    coloModal.classList.add('open');
+  }
+  function closeColoModal(){ coloModal.classList.remove('open'); }
+
+  async function deleteColo(id){
+    const { error } = await supabaseClient.from('coloscopies').delete().eq('id', id);
+    if (error){ console.error(error); return; }
+    coloscopies = coloscopies.filter(a => a.id !== id);
+  }
+
+  function renderExisting(){
+    const list = coloscopies.filter(a => a.date === selectedDateStr);
+    if (list.length === 0){ existingBox.innerHTML = ''; return; }
+    let html = '<h4>Déjà prévu ce jour-là</h4>';
+    list.forEach(a => {
+      html += '<div class="existing-item"><span>' + (a.time || '') + (a.lieu ? ' — ' + escapeHtml(a.lieu) : '') + '</span>'
+        + '<button type="button" class="upcoming-remove" data-id="' + a.id + '" aria-label="Supprimer">✕</button></div>';
+    });
+    existingBox.innerHTML = html;
+    existingBox.querySelectorAll('button[data-id]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await deleteColo(btn.dataset.id);
+        renderExisting(); renderCalendar(); renderUpcoming();
+      });
+    });
+  }
+
+  document.getElementById('colo-close').addEventListener('click', closeColoModal);
+  document.getElementById('colo-cancel').addEventListener('click', closeColoModal);
+  coloModal.addEventListener('click', (e) => { if (e.target === coloModal) closeColoModal(); });
+
+  document.getElementById('colo-save').addEventListener('click', async () => {
+    const saveBtn = document.getElementById('colo-save');
+    saveBtn.disabled = true;
+
+    const { data, error } = await supabaseClient
+      .from('coloscopies')
+      .insert({
+        user_id: currentUserId, date: selectedDateStr, heure: coloTime.value || null,
+        lieu: coloLieu.value.trim() || null, medecin: coloMedecin.value.trim() || null,
+        preparation: coloPrep.value.trim() || null, note: coloNote.value.trim() || null, done: false
+      })
+      .select('id, date, heure, lieu, medecin, preparation, note, compte_rendu, done')
+      .single();
+
+    saveBtn.disabled = false;
+
+    if (error){
+      coloError.textContent = "Impossible d'enregistrer : " + error.message;
+      coloError.style.display = 'block';
+      return;
+    }
+
+    coloscopies.push(mapRow(data));
+    closeColoModal();
+    renderCalendar();
+    renderUpcoming();
+    showToast('Coloscopie enregistrée');
+  });
+
+  function isColoDone(a){ return !!a.done || a.date < todayISO(); }
+
+  const crModal = document.getElementById('cr-modal');
+  const crText = document.getElementById('cr-text');
+  let crTargetId = null;
+
+  function openCrModal(id){
+    const c = coloscopies.find(a => a.id === id);
+    if (!c) return;
+    crTargetId = id;
+    crText.value = c.compteRendu || '';
+    crModal.classList.add('open');
+  }
+  function closeCrModal(){ crModal.classList.remove('open'); }
+  document.getElementById('cr-close').addEventListener('click', closeCrModal);
+  document.getElementById('cr-cancel').addEventListener('click', closeCrModal);
+  crModal.addEventListener('click', (e) => { if (e.target === crModal) closeCrModal(); });
+
+  document.getElementById('cr-save').addEventListener('click', async () => {
+    const { error } = await supabaseClient.from('coloscopies').update({ compte_rendu: crText.value.trim() }).eq('id', crTargetId);
+    if (error){ console.error(error); return; }
+    const c = coloscopies.find(a => a.id === crTargetId);
+    if (c) c.compteRendu = crText.value.trim();
+    closeCrModal();
+    renderUpcoming();
+  });
+
+  function renderUpcoming(){
+    const upcomingList = document.getElementById('upcoming-list');
+    const sorted = coloscopies.slice().sort((a, b) => b.date.localeCompare(a.date));
+
+    if (sorted.length === 0){
+      upcomingList.innerHTML = '<p class="empty-hint">Aucune coloscopie enregistrée. Clique sur une date du calendrier pour en ajouter une.</p>';
+      renderReminder();
+      return;
+    }
+    let html = '';
+    sorted.forEach(a => {
+      const d = new Date(a.date + 'T00:00:00');
+      const month = d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '');
+      const done = isColoDone(a);
+      let infoLines = [];
+      if (a.lieu) infoLines.push(escapeHtml(a.lieu));
+      if (a.medecin) infoLines.push(escapeHtml(a.medecin));
+      if (a.preparation) infoLines.push('Préparation : ' + escapeHtml(a.preparation));
+      html += '<div class="upcoming-item' + (done ? ' is-done' : '') + '" style="align-items:flex-start;">'
+        + '<div class="upcoming-date"><div class="d">' + d.getDate() + '</div><div class="m">' + month + '</div></div>'
+        + '<div class="upcoming-info"><h3>Coloscopie</h3>'
+        + (infoLines.length ? '<p>' + infoLines.join(' · ') + '</p>' : '')
+        + (done ? ('<div class="compte-rendu-box">' + (a.compteRendu ? escapeHtml(a.compteRendu) : 'Aucun compte-rendu ajouté.') + '</div><button type="button" class="cr-btn" data-cr-id="' + a.id + '" style="margin-top:6px;">' + (a.compteRendu ? 'Modifier le compte-rendu' : '+ Ajouter un compte-rendu') + '</button>') : '')
+        + '</div>'
+        + '<div class="upcoming-time">' + (a.time || '') + '</div>'
+        + '<button type="button" class="upcoming-remove" data-id="' + a.id + '" aria-label="Supprimer">✕</button>'
+        + '</div>';
+    });
+    upcomingList.innerHTML = html;
+    upcomingList.querySelectorAll('button[data-id]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await deleteColo(btn.dataset.id);
+        renderCalendar(); renderUpcoming();
+      });
+    });
+    upcomingList.querySelectorAll('button[data-cr-id]').forEach(btn => {
+      btn.addEventListener('click', () => openCrModal(btn.dataset.crId));
+    });
+    renderReminder();
+  }
+
+  function daysUntil(dateStr){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const target = new Date(dateStr + 'T00:00:00');
+    return Math.round((target - today) / 86400000);
+  }
+
+  function renderReminder(){
+    const reminderCard = document.getElementById('reminder-card');
+    const today = todayISO();
+    const next = coloscopies
+      .filter(a => a.date >= today && !isColoDone(a))
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+
+    if (!next){
+      reminderCard.classList.add('reminder-empty');
+      reminderCard.innerHTML =
+        '<img class="mascot" src="' + MASCOT_COLO + '" alt="Mascotte Ma Mici avec une bouteille d\u2019eau">'
+        + '<div class="reminder-eyebrow">📅 Rappel Ma Mici</div>'
+        + '<h3>Aucune coloscopie prévue</h3>'
+        + '<div class="reminder-divider"></div>'
+        + '<p class="reminder-tip">Clique sur une date du calendrier pour en ajouter une.</p>';
+      return;
+    }
+
+    reminderCard.classList.remove('reminder-empty');
+    const diff = daysUntil(next.date);
+    let mainText, badgeText;
+    if (diff <= 0){
+      mainText = 'C\u2019est aujourd\u2019hui !';
+      badgeText = 'Aujourd\u2019hui';
+    } else if (diff === 1){
+      mainText = 'C\u2019est demain ! Pense à ta préparation';
+      badgeText = 'Demain';
+    } else if (diff <= 2){
+      mainText = 'Coloscopie dans ' + diff + ' jours : régime liquide bientôt';
+      badgeText = 'Dans ' + diff + ' jours';
+    } else {
+      const d = new Date(next.date + 'T00:00:00');
+      const dateLabel = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+      mainText = 'Coloscopie le ' + dateLabel;
+      badgeText = 'Dans ' + diff + ' jours';
+    }
+
+    reminderCard.innerHTML =
+      '<img class="mascot" src="' + MASCOT_COLO + '" alt="Mascotte Ma Mici avec une bouteille d\u2019eau">'
+      + '<div class="reminder-eyebrow">📅 Rappel Ma Mici</div>'
+      + '<h3>' + mainText + '</h3>'
+      + '<span class="reminder-badge">' + badgeText + '</span>'
+      + '<div class="reminder-divider"></div>'
+      + '<p class="reminder-tip">Pense à bien t\u2019hydrater pendant la préparation 💜</p>';
+  }
+
+  (async function init(){
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session){
+      window.location.href = 'connexion.html';
+      return;
+    }
+    currentUserId = session.user.id;
+    await loadColoscopies();
+    renderCalendar();
+    renderUpcoming();
+  })();
+
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ closeColoModal(); closeCrModal(); } });
 </script>
+
 
 </body>
 </html>
