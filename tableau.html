@@ -237,6 +237,18 @@
   .empty-state .empty-title{ font-weight:700; color:var(--ink); font-size:0.98rem; margin-bottom:8px; }
   .empty-state p{ font-size:0.88rem; max-width:280px; }
   .empty-state .mini-cta{ margin-top:20px; padding:10px 20px; font-size:0.85rem; }
+
+  /* Badge d'ancienneté */
+  .badge-days{ font-family:'Baloo 2'; font-weight:800; font-size:2.4rem; color:var(--violet-700); line-height:1; }
+  .badge-days-label{ font-size:0.88rem; color:var(--ink-soft); margin-bottom:14px; }
+  .badge-pill{
+    display:inline-block; background:var(--violet-100); color:var(--violet-700); font-weight:700;
+    font-size:0.9rem; padding:8px 20px; border-radius:100px;
+  }
+
+  /* Pépite du jour */
+  .pepite-eyebrow{ font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); margin-bottom:10px; }
+  .pepite-text{ font-size:1.05rem; color:var(--ink); line-height:1.55; max-width:340px; margin:0 auto; }
   .empty-state .mini-cta[disabled]{ opacity:0.55; cursor:not-allowed; }
   .empty-state .mini-cta[disabled]:hover{ background:transparent; transform:none; }
 
@@ -400,31 +412,23 @@
       <div class="dash-card highlight-card">
         <div class="dash-card-head">
           <div class="dash-card-title">
-            <span class="emoji-badge" style="background:var(--peach-soft);">🥣</span>
-            <h2>Recette du jour</h2>
+            <span class="emoji-badge" style="background:var(--violet-100);">🎖️</span>
+            <h2>Ton badge Ma Mici</h2>
           </div>
         </div>
-        <div class="empty-state">
-          <div class="icon-circle" style="background:var(--peach-soft);">🥣</div>
-          <p class="empty-title">Bientôt de bonnes recettes adaptées à ton confort digestif</p>
-          <p>On te prépare des idées gourmandes, faciles et douces pour ton ventre.</p>
-          <button type="button" class="btn btn-ghost mini-cta" disabled>Bientôt disponible</button>
+        <div class="empty-state" id="badge-box">
+          <p>Chargement...</p>
         </div>
       </div>
 
       <div class="dash-card highlight-card">
         <div class="dash-card-head">
           <div class="dash-card-title">
-            <span class="emoji-badge" style="background:var(--sky-soft);">💬</span>
-            <h2>Communauté</h2>
+            <span class="emoji-badge" style="background:var(--mint-soft);">✨</span>
+            <h2>Chaque jour, une pépite</h2>
           </div>
         </div>
-        <div class="empty-state">
-          <img class="mascot-mini" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABfCAYAAAAXtMJAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QA/wD/AP+gvaeTAAABQklEQVR4nO3aQQqCQBgF4L9RB2gTnaFj1AlaVptu0LqjRacIou4RQVAX6qKgIAoiSBTBRXHhCzFmYWaEP4Rk/ObpuIzMDxgAAJDsAeaAg4v2eaHqZoyIeoBUmGkuvygADhBODqAAtQAAAABJRU5ErkJggg==" alt="Mascotte Ma Mici" onerror="this.style.display='none'">
-          <p class="empty-title">Tu n'es pas seul·e</p>
-          <p>Rejoins d'autres personnes concernées, pose tes questions et partage ton vécu, sans jugement.</p>
-          <a href="communaute.html" class="btn btn-primary mini-cta">Rejoindre la communauté</a>
-        </div>
+        <div class="empty-state" id="pepite-box"></div>
       </div>
 
     </div>
@@ -594,6 +598,93 @@
       loadingEl.style.display = 'none';
       emptyEl.style.display = 'block';
     }
+  })();
+
+  /* Badge d'ancienneté Ma Mici */
+  (async function initBadge(){
+    const box = document.getElementById('badge-box');
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session){ return; }
+
+    const { data: profile, error } = await supabaseClient
+      .from('Profiles')
+      .select('created_at')
+      .eq('id', session.user.id)
+      .single();
+
+    if (error || !profile || !profile.created_at){
+      box.innerHTML = '<p>Bienvenue dans l\u2019aventure Ma Mici !</p>';
+      return;
+    }
+
+    const created = new Date(profile.created_at);
+    const now = new Date();
+    const days = Math.max(0, Math.floor((now - created) / 86400000));
+
+    let badgeLabel;
+    if (days >= 365) badgeLabel = '🏆 1 an avec Ma Mici';
+    else if (days >= 180) badgeLabel = '🥇 6 mois avec Ma Mici';
+    else if (days >= 100) badgeLabel = '🥈 100 jours avec Ma Mici';
+    else if (days >= 30) badgeLabel = '🥉 1 mois avec Ma Mici';
+    else if (days >= 7) badgeLabel = '✨ 1 semaine avec Ma Mici';
+    else badgeLabel = '🌱 Bienvenue dans l\u2019aventure !';
+
+    box.innerHTML = '<div class="badge-days">' + days + '</div>'
+      + '<div class="badge-days-label">jour' + (days > 1 ? 's' : '') + ' avec Ma Mici</div>'
+      + '<span class="badge-pill">' + badgeLabel + '</span>';
+  })();
+
+  /* Chaque jour, une pépite : citation, le saviez-vous, conseil pratique — tourne automatiquement */
+  (function initPepite(){
+    const citations = [
+      "Chaque petit pas compte, même les jours difficiles.",
+      "Tu n'es pas ta maladie, tu es bien plus que ça.",
+      "Prendre soin de soi n'est jamais égoïste.",
+      "Ton rythme est le bon rythme.",
+      "Il n'y a pas de honte à avoir besoin de repos.",
+      "Une bonne journée commence par un peu de patience envers soi-même.",
+      "Tu avances, même quand ça ne se voit pas de l'extérieur.",
+      "Demander de l'aide, c'est aussi une force.",
+      "Les jours difficiles ne durent pas, les personnes fortes si.",
+      "Sois aussi bienveillant·e envers toi qu'envers un·e ami·e."
+    ];
+    const saviezVous = [
+      "Les MICI touchent environ 1 personne sur 1000 en France.",
+      "La maladie de Crohn peut toucher n'importe quelle partie du tube digestif, de la bouche à l'anus.",
+      "La RCH, elle, se limite au côlon et au rectum.",
+      "Le stress n'est pas une cause des MICI, mais il peut influencer les symptômes.",
+      "Les MICI ne sont pas contagieuses.",
+      "Les MICI apparaissent le plus souvent entre 15 et 35 ans.",
+      "Il existe des périodes de rémission qui peuvent durer plusieurs mois, voire années.",
+      "Le microbiote intestinal fait l'objet de nombreuses recherches dans les MICI.",
+      "Les MICI sont des maladies chroniques, mais pas des maladies dégénératives.",
+      "L'alimentation ne cause pas les MICI, mais peut influencer le confort digestif au quotidien."
+    ];
+    const conseils = [
+      "Tiens un carnet de bord de tes repas pour repérer plus facilement tes intolérances.",
+      "Bois régulièrement de l'eau tout au long de la journée, surtout en période de poussée.",
+      "Prépare un petit kit (protections, lingettes, change) à garder dans ton sac au cas où.",
+      "N'hésite pas à parler de ta fatigue à ton médecin, ce n'est pas \"juste dans la tête\".",
+      "Repère à l'avance les toilettes sur ton trajet si tu es anxieux·se à ce sujet.",
+      "Prends le temps de bien mâcher tes repas, ça facilite la digestion.",
+      "Note tes symptômes juste après un repas, pas seulement le soir : la mémoire s'efface vite.",
+      "Un carnet de questions avant chaque rendez-vous médical t'aide à ne rien oublier.",
+      "Le sommeil influence beaucoup l'inflammation : essaie de garder des horaires réguliers.",
+      "Tu as le droit de dire non à une sortie si tu ne te sens pas bien, sans te justifier."
+    ];
+
+    const dayIndex = Math.floor(Date.now() / 86400000);
+    const categories = [
+      { label: '💬 Citation du jour', items: citations },
+      { label: '🔬 Le saviez-vous ?', items: saviezVous },
+      { label: '💡 Conseil du jour', items: conseils }
+    ];
+    const cat = categories[dayIndex % categories.length];
+    const item = cat.items[dayIndex % cat.items.length];
+
+    document.getElementById('pepite-box').innerHTML =
+      '<div class="pepite-eyebrow">' + cat.label + '</div>'
+      + '<p class="pepite-text">' + item + '</p>';
   })();
 </script>
 
