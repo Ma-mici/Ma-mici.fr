@@ -169,15 +169,30 @@
   }
   .filter-chip:hover{ border-color:var(--violet-300); }
   .filter-chip.active{ background:var(--violet-100); border-color:var(--violet-500); color:var(--ink); }
-  .filter-chip input{ display:none; }
+  .filter-chip input{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
 
   .map-toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+  .contrib-banner{
+    display:flex; align-items:flex-start; gap:12px; background:var(--violet-100); border-radius:var(--radius-md);
+    padding:16px 18px; margin-bottom:16px;
+  }
+  .contrib-banner .contrib-icon{ font-size:1.3rem; flex-shrink:0; }
+  .contrib-banner p{ font-size:0.88rem; color:var(--ink); margin:0; }
+  .osm-note-box{ margin-top:8px; }
+  .osm-rate-select{
+    padding:4px 8px; border-radius:8px; border:1.5px solid var(--line); background:var(--bg-flat);
+    font-family:inherit; font-size:0.8rem;
+  }
   #map{ width:100%; height:440px; border-radius:var(--radius-md); border:1px solid var(--line); z-index:1; }
 
   .leaflet-popup-content{ font-family:'Inter', sans-serif; font-size:0.9rem; }
   .popup-title{ font-family:'Baloo 2'; font-weight:700; font-size:1rem; margin-bottom:6px; }
   .popup-tags{ display:flex; gap:6px; flex-wrap:wrap; margin:6px 0; }
   .popup-tag{ font-size:0.7rem; font-weight:700; padding:3px 9px; border-radius:100px; background:var(--mint-soft); color:#1F6B52; }
+  .popup-photo{ width:100%; max-width:220px; height:120px; object-fit:cover; border-radius:12px; margin-bottom:8px; }
   .popup-actions{ display:flex; gap:6px; margin-top:8px; }
   .popup-actions a{
     flex:1; text-align:center; padding:7px 10px; border-radius:100px; font-size:0.78rem; font-weight:700;
@@ -330,12 +345,20 @@
         <label class="filter-chip active" id="filter-gratuit">
           <input type="checkbox" checked> 🚻 WC gratuits
         </label>
+        <label class="filter-chip active" id="filter-payant">
+          <input type="checkbox" checked> 💰 WC payants
+        </label>
         <label class="filter-chip active" id="filter-mici">
           <input type="checkbox" checked> 💜 MICI Friendly
         </label>
         <label class="filter-chip active" id="filter-pmr">
           <input type="checkbox" checked> ♿ Accès PMR
         </label>
+      </div>
+
+      <div class="contrib-banner">
+        <span class="contrib-icon">💜</span>
+        <p>Aide la communauté : chaque lieu que tu ajoutes ou que tu notes aide d'autres personnes atteintes de MICI à mieux se déplacer sereinement. Les toilettes déjà connues sur OpenStreetMap sont affichées automatiquement (icône bleue) — clique dessus pour voir l'adresse et laisser une note de propreté.</p>
       </div>
 
       <div class="map-toolbar">
@@ -371,6 +394,9 @@
       <label class="filter-chip" id="place-gratuit-chip">
         <input type="checkbox" id="place-gratuit"> 🚻 WC gratuit
       </label>
+      <label class="filter-chip" id="place-payant-chip">
+        <input type="checkbox" id="place-payant"> 💰 WC payant
+      </label>
       <label class="filter-chip" id="place-mici-chip">
         <input type="checkbox" id="place-mici"> 💜 MICI Friendly
       </label>
@@ -379,6 +405,10 @@
       </label>
     </div>
 
+    <div class="form-row">
+      <label for="place-photo">Photo du lieu (optionnel)</label>
+      <input type="file" id="place-photo" accept="image/png, image/jpeg, image/webp">
+    </div>
     <div class="form-row">
       <label for="place-note">Note (optionnel)</label>
       <input type="text" id="place-note" placeholder="Ex : accessible aux horaires d'ouverture">
@@ -500,14 +530,15 @@
   function mapRow(r){
     return {
       id: r.id, nom: r.nom, lat: r.latitude, lng: r.longitude, adresse: r.adresse || '',
-      gratuit: !!r.gratuit, mici: !!r.mici_friendly, pmr: !!r.pmr, note: r.note || ''
+      gratuit: !!r.gratuit, payant: !!r.payant, mici: !!r.mici_friendly, pmr: !!r.pmr, note: r.note || '',
+      photoUrl: r.photo_url || ''
     };
   }
 
   async function loadLieux(){
     const { data, error } = await supabaseClient
       .from('wc_lieux')
-      .select('id, nom, latitude, longitude, adresse, gratuit, mici_friendly, pmr, note');
+      .select('id, nom, latitude, longitude, adresse, gratuit, payant, mici_friendly, pmr, note, photo_url');
     if (error){ console.error(error); return; }
     lieux = (data || []).map(mapRow);
   }
@@ -515,6 +546,7 @@
   function activeFilters(){
     return {
       gratuit: document.getElementById('filter-gratuit').classList.contains('active'),
+      payant: document.getElementById('filter-payant').classList.contains('active'),
       mici: document.getElementById('filter-mici').classList.contains('active'),
       pmr: document.getElementById('filter-pmr').classList.contains('active')
     };
@@ -523,11 +555,13 @@
   function popupHtml(l){
     let tags = '';
     if (l.gratuit) tags += '<span class="popup-tag">🚻 Gratuit</span>';
+    if (l.payant) tags += '<span class="popup-tag" style="background:var(--peach-soft); color:#B24B2C;">💰 Payant</span>';
     if (l.mici) tags += '<span class="popup-tag">💜 MICI Friendly</span>';
     if (l.pmr) tags += '<span class="popup-tag">♿ PMR</span>';
     const gmaps = 'https://www.google.com/maps/dir/?api=1&destination=' + l.lat + ',' + l.lng;
     const amaps = 'https://maps.apple.com/?daddr=' + l.lat + ',' + l.lng;
-    return '<div class="popup-title">' + escapeHtml(l.nom) + '</div>'
+    return (l.photoUrl ? '<img src="' + l.photoUrl + '" alt="Photo du lieu" class="popup-photo">' : '')
+      + '<div class="popup-title">' + escapeHtml(l.nom) + '</div>'
       + (l.adresse ? '<div>' + escapeHtml(l.adresse) + '</div>' : '')
       + '<div class="popup-tags">' + tags + '</div>'
       + (l.note ? '<div style="font-style:italic; margin-top:4px;">' + escapeHtml(l.note) + '</div>' : '')
@@ -542,9 +576,7 @@
     markers = [];
     const f = activeFilters();
     lieux.forEach(l => {
-      if (l.gratuit && !f.gratuit) return;
-      if (l.mici && !f.mici && !l.gratuit) { /* garde l'affichage si au moins un critère actif correspond */ }
-      const matches = (l.gratuit && f.gratuit) || (l.mici && f.mici) || (l.pmr && f.pmr) || (!l.gratuit && !l.mici && !l.pmr);
+      const matches = (l.gratuit && f.gratuit) || (l.payant && f.payant) || (l.mici && f.mici) || (l.pmr && f.pmr) || (!l.gratuit && !l.payant && !l.mici && !l.pmr);
       if (!matches) return;
       const marker = L.marker([l.lat, l.lng]).addTo(map);
       marker.bindPopup(popupHtml(l));
@@ -552,10 +584,125 @@
     });
   }
 
+  /* ============== Toilettes déjà connues sur OpenStreetMap (via Overpass) ============== */
+  const osmIcon = L.icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+    className: 'osm-toilet-icon'
+  });
+
+  let osmMarkers = [];
+  let osmFetchTimer = null;
+  const noteAverages = {};
+
+  function osmAddress(tags){
+    const parts = [];
+    if (tags['addr:housenumber']) parts.push(tags['addr:housenumber']);
+    if (tags['addr:street']) parts.push(tags['addr:street']);
+    if (tags['addr:city']) parts.push(tags['addr:city']);
+    return parts.join(' ');
+  }
+
+  async function loadNoteAverage(osmId){
+    const { data, error } = await supabaseClient.from('wc_notes').select('note').eq('osm_id', osmId);
+    if (error || !data || data.length === 0) return null;
+    const avg = data.reduce((s, r) => s + r.note, 0) / data.length;
+    return { avg: avg.toFixed(1), count: data.length };
+  }
+
+  function osmPopupHtml(osmId, nom, adresse){
+    return '<div class="popup-title">' + escapeHtml(nom) + '</div>'
+      + (adresse ? '<div>' + escapeHtml(adresse) + '</div>' : '<div style="font-style:italic;">Adresse non renseignée sur OpenStreetMap</div>')
+      + '<div class="osm-note-box" id="note-box-' + osmId + '">Chargement de la note...</div>'
+      + '<div class="popup-actions">'
+        + '<a href="https://www.google.com/maps/dir/?api=1&destination=' + osmId.split(':')[1] + '" target="_blank" rel="noopener" style="display:none;"></a>'
+      + '</div>';
+  }
+
+  async function fillOsmPopup(osmId, lat, lng){
+    const box = document.getElementById('note-box-' + osmId);
+    if (!box) return;
+    const result = await loadNoteAverage(osmId);
+    const avgHtml = result
+      ? '<span class="popup-tag">🧼 ' + result.avg + '/10 (' + result.count + ' avis)</span>'
+      : '<span class="popup-tag" style="background:var(--violet-100); color:var(--violet-700);">Pas encore noté</span>';
+    box.innerHTML = avgHtml
+      + '<div style="margin-top:8px; display:flex; gap:6px; align-items:center;">'
+        + '<label style="font-size:0.8rem; font-weight:600;">Noter la propreté :</label>'
+        + '<select class="osm-rate-select" id="rate-' + osmId + '">'
+          + Array.from({length:10}, (_, i) => '<option value="' + (i+1) + '">' + (i+1) + '</option>').join('')
+        + '</select>'
+        + '<button type="button" class="btn btn-primary" style="padding:6px 12px; font-size:0.75rem;" data-osm-rate-btn="' + osmId + '" data-lat="' + lat + '" data-lng="' + lng + '">OK</button>'
+      + '</div>'
+      + '<div class="popup-actions" style="margin-top:8px;">'
+        + '<a href="https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '" target="_blank" rel="noopener">Google Maps</a>'
+        + '<a href="https://maps.apple.com/?daddr=' + lat + ',' + lng + '" target="_blank" rel="noopener">Apple Maps</a>'
+      + '</div>';
+
+    box.querySelector('[data-osm-rate-btn]').addEventListener('click', async (e) => {
+      const btn = e.target;
+      const note = Number(document.getElementById('rate-' + osmId).value);
+      btn.disabled = true;
+      const { error } = await supabaseClient
+        .from('wc_notes')
+        .upsert({ osm_id: osmId, user_id: currentUserId, note: note }, { onConflict: 'osm_id,user_id' });
+      btn.disabled = false;
+      if (error){ showToast("Impossible d'enregistrer ta note"); return; }
+      showToast('Merci pour ta note !');
+      fillOsmPopup(osmId, lat, lng);
+    });
+  }
+
+  async function loadOsmToilets(){
+    if (map.getZoom() < 13){
+      osmMarkers.forEach(m => map.removeLayer(m));
+      osmMarkers = [];
+      return;
+    }
+    const b = map.getBounds();
+    const bbox = b.getSouth() + ',' + b.getWest() + ',' + b.getNorth() + ',' + b.getEast();
+    const query = '[out:json][timeout:20];node["amenity"="toilets"](' + bbox + ');out body;';
+
+    try {
+      const res = await fetch('https://overpass-api.de/api/interpreter', {
+        method: 'POST',
+        body: 'data=' + encodeURIComponent(query)
+      });
+      const data = await res.json();
+
+      osmMarkers.forEach(m => map.removeLayer(m));
+      osmMarkers = [];
+
+      (data.elements || []).forEach(el => {
+        const osmId = 'node:' + el.id;
+        const tags = el.tags || {};
+        const nom = tags.name || 'Toilettes publiques';
+        const adresse = osmAddress(tags);
+
+        const marker = L.marker([el.lat, el.lon], { icon: osmIcon }).addTo(map);
+        marker.bindPopup(osmPopupHtml(osmId, nom, adresse));
+        marker.on('popupopen', () => fillOsmPopup(osmId, el.lat, el.lon));
+        osmMarkers.push(marker);
+      });
+    } catch (e){
+      console.error('Overpass indisponible', e);
+    }
+  }
+
+  map.on('moveend', () => {
+    clearTimeout(osmFetchTimer);
+    osmFetchTimer = setTimeout(loadOsmToilets, 600);
+  });
+
   document.querySelectorAll('.filter-row .filter-chip').forEach(chip => {
     if (chip.closest('#place-modal')) return;
-    chip.addEventListener('click', () => {
-      chip.classList.toggle('active');
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      const cb = chip.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = !cb.checked;
+      chip.classList.toggle('active', cb ? cb.checked : !chip.classList.contains('active'));
       renderMarkers();
     });
   });
@@ -579,8 +726,10 @@
   function openPlaceModal(latlng){
     placeNom.value = ''; placeAdresse.value = ''; placeNote.value = '';
     document.getElementById('place-gratuit').checked = false;
+    document.getElementById('place-payant').checked = false;
     document.getElementById('place-mici').checked = false;
     document.getElementById('place-pmr').checked = false;
+    document.getElementById('place-photo').value = '';
     document.querySelectorAll('#place-modal .filter-chip').forEach(c => c.classList.remove('active'));
     placeError.style.display = 'none';
     selectedLatLng = latlng || null;
@@ -597,7 +746,12 @@
   placeModal.addEventListener('click', (e) => { if (e.target === placeModal) closePlaceModal(); });
 
   document.querySelectorAll('#place-modal .filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => chip.classList.toggle('active'));
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      const cb = chip.querySelector('input[type="checkbox"]');
+      if (cb) cb.checked = !cb.checked;
+      chip.classList.toggle('active', cb ? cb.checked : !chip.classList.contains('active'));
+    });
   });
 
   document.getElementById('place-use-location').addEventListener('click', () => {
@@ -629,6 +783,31 @@
 
     const saveBtn = document.getElementById('place-save');
     saveBtn.disabled = true;
+    saveBtn.textContent = 'Enregistrement...';
+
+    let photoUrl = null;
+    const photoFile = document.getElementById('place-photo').files[0];
+    if (photoFile){
+      if (photoFile.size > 3 * 1024 * 1024){
+        placeError.textContent = "La photo dépasse 3 Mo.";
+        placeError.style.display = 'block';
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Enregistrer';
+        return;
+      }
+      const ext = photoFile.name.split('.').pop();
+      const filePath = currentUserId + '/' + Date.now() + '.' + ext;
+      const { error: uploadError } = await supabaseClient.storage.from('lieux-photos').upload(filePath, photoFile);
+      if (uploadError){
+        placeError.textContent = "Impossible d'envoyer la photo : " + uploadError.message;
+        placeError.style.display = 'block';
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Enregistrer';
+        return;
+      }
+      const { data: publicUrlData } = supabaseClient.storage.from('lieux-photos').getPublicUrl(filePath);
+      photoUrl = publicUrlData.publicUrl;
+    }
 
     const { data, error } = await supabaseClient
       .from('wc_lieux')
@@ -639,14 +818,17 @@
         longitude: selectedLatLng.lng,
         adresse: placeAdresse.value.trim() || null,
         gratuit: document.getElementById('place-gratuit').checked,
+        payant: document.getElementById('place-payant').checked,
         mici_friendly: document.getElementById('place-mici').checked,
         pmr: document.getElementById('place-pmr').checked,
-        note: placeNote.value.trim() || null
+        note: placeNote.value.trim() || null,
+        photo_url: photoUrl
       })
-      .select('id, nom, latitude, longitude, adresse, gratuit, mici_friendly, pmr, note')
+      .select('id, nom, latitude, longitude, adresse, gratuit, payant, mici_friendly, pmr, note, photo_url')
       .single();
 
     saveBtn.disabled = false;
+    saveBtn.textContent = 'Enregistrer';
 
     if (error){
       placeError.textContent = "Impossible d'enregistrer : " + error.message;
@@ -671,6 +853,7 @@
     currentUserId = session.user.id;
     await loadLieux();
     renderMarkers();
+    loadOsmToilets();
   })();
 </script>
 
