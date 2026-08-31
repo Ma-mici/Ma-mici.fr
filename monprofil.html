@@ -243,37 +243,6 @@
     .panel-card{ padding:26px 20px; }
     .two-col{ grid-template-columns:1fr; }
   }
-
-  /* ---------- Sous-navigation "Mon profil" ---------- */
-  .profil-tabs{
-    display:flex; gap:8px; flex-wrap:wrap; padding:6px; margin-bottom:28px;
-    background:var(--white); border:1px solid var(--line); border-radius:100px; box-shadow:var(--shadow);
-  }
-  .profil-tab-btn{
-    display:flex; align-items:center; gap:8px; padding:11px 20px; border-radius:100px;
-    font-weight:700; font-size:0.88rem; color:var(--ink-soft); background:none; font-family:inherit;
-    white-space:nowrap; transition:background .18s ease, color .18s ease; flex:1; justify-content:center;
-  }
-  .profil-tab-btn:hover{ color:var(--ink); background:var(--violet-100); }
-  .profil-tab-btn.active{ color:var(--white); background:var(--violet-500); }
-  .profil-tab-panel{ display:none; }
-  .profil-tab-panel.active{ display:block; animation:profilFadeIn .25s ease; }
-  @keyframes profilFadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
-  .tol-hint-box{
-    display:flex; align-items:flex-start; gap:10px; background:var(--violet-100); color:var(--ink);
-    font-size:0.86rem; font-weight:600; padding:14px 18px; border-radius:var(--radius-sm); margin-bottom:18px;
-  }
-  .contact-group-label{ font-weight:700; font-size:0.95rem; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-  .contact-group-label .tag{ font-size:0.72rem; font-weight:700; color:var(--violet-700); background:var(--violet-100); padding:3px 10px; border-radius:100px; }
-  .contact-group + .contact-group{ margin-top:26px; padding-top:26px; border-top:1px solid var(--line); }
-
-  @media (max-width:820px){
-    .profil-tabs{ border-radius:var(--radius-md); flex-wrap:wrap; }
-    .profil-tab-btn{ flex:1 1 45%; }
-  }
-  @media (max-width:560px){
-    .profil-tab-btn{ flex:1 1 100%; }
-  }
 </style>
 </head>
 <body>
@@ -330,7 +299,7 @@
         <div class="mega-item has-dropdown">
           <button type="button" class="mega-link mega-toggle">🛠️ Outils <span class="caret">▾</span></button>
           <div class="mega-dropdown">
-            <a href="outils.html#carte-wc">Carte des WC & lieux réceptifs</a>
+            <a href="carte-wc.html">Carte des WC & lieux réceptifs</a>
             <a href="outils.html#kit-urgence">Kit urgence & carte voyage</a>
             <a href="outils.html#fiches">Fiches de communication</a>
             <a href="outils.html#annuaire">Annuaire des professionnels de santé</a>
@@ -380,16 +349,6 @@
       <h1>Mon profil</h1>
       <p>Gère tes informations personnelles et tes préférences</p>
     </div>
-
-    <nav class="profil-tabs" id="profil-tabs" aria-label="Sous-catégories de Mon profil">
-      <button type="button" class="profil-tab-btn active" data-tab-target="general">👤 Informations générales</button>
-      <button type="button" class="profil-tab-btn" data-tab-target="contacts">📞 Mes contacts</button>
-      <button type="button" class="profil-tab-btn" data-tab-target="aliments">🥗 Mes aliments</button>
-      <button type="button" class="profil-tab-btn" data-tab-target="consentement-securite">🔒 Consentement &amp; sécurité</button>
-      <button type="button" class="profil-tab-btn" data-tab-target="suppression">🗑️ Suppression du compte</button>
-    </nav>
-
-    <div class="profil-tab-panel active" data-tab-panel="general">
 
     <div class="panel-card">
       <h2>Photo de profil</h2>
@@ -477,55 +436,8 @@
       </div>
     </div>
 
-    </div>
-
-    <div class="profil-tab-panel" data-tab-panel="contacts">
-
     <div class="panel-card">
-      <h2>Mes contacts</h2>
-      <p style="text-align:center; margin-bottom:22px;">La liste de tes contacts utiles en cas de besoin : ton professionnel de santé référent et ton contact d'urgence.</p>
-
-      <div class="contact-group">
-        <div class="contact-group-label">🩺 Professionnel de santé <span class="tag">Référent</span></div>
-        <div class="two-col">
-          <div class="form-row">
-            <label for="p-medecin-nom">Médecin / gastro-entérologue référent</label>
-            <input type="text" id="p-medecin-nom" placeholder="Nom du praticien">
-          </div>
-          <div class="form-row">
-            <label for="p-medecin-tel">Téléphone du médecin</label>
-            <input type="text" id="p-medecin-tel" placeholder="Ex : 01 23 45 67 89">
-          </div>
-        </div>
-      </div>
-
-      <div class="contact-group">
-        <div class="contact-group-label">🚨 Contact d'urgence <span class="tag">Proche</span></div>
-        <div class="two-col">
-          <div class="form-row">
-            <label for="p-urgence-nom">Contact d'urgence (proche)</label>
-            <input type="text" id="p-urgence-nom" placeholder="Nom du proche">
-          </div>
-          <div class="form-row">
-            <label for="p-urgence-tel">Téléphone du contact d'urgence</label>
-            <input type="text" id="p-urgence-tel" placeholder="Ex : 06 12 34 56 78">
-          </div>
-        </div>
-      </div>
-
-      <span class="form-error" id="contacts-error"></span>
-      <span class="form-success" id="contacts-success">✓ Contacts mis à jour.</span>
-      <div class="save-row">
-        <button type="button" class="btn btn-primary" id="contacts-save-btn">Enregistrer mes contacts</button>
-      </div>
-    </div>
-
-    </div>
-
-    <div class="profil-tab-panel" data-tab-panel="aliments">
-
-    <div class="panel-card">
-      <h2>Mes aliments</h2>
+      <h2>Mes préférences alimentaires</h2>
       <p style="text-align:center; margin-bottom:22px;">Utilisées pour te proposer des idées de recettes vraiment adaptées.</p>
 
       <span class="field-label" style="font-weight:700; font-size:0.95rem; margin-bottom:10px; display:block;">Régime(s) suivi(s)</span>
@@ -538,9 +450,6 @@
       </div>
 
       <span class="field-label" style="font-weight:700; font-size:0.95rem; margin:22px 0 10px; display:block;">Aliments que tu ne supportes pas</span>
-      <div class="tol-hint-box">
-        💡 <span>Clique simplement sur un aliment dans la liste ci-dessous pour indiquer que c'est un aliment que tu ne supportes pas. Reclique dessus pour le retirer de la liste.</span>
-      </div>
       <input type="text" id="tol-search" placeholder="🔍 Rechercher un aliment (ex : kiwi, gluten, fromage...)" class="tol-search-input">
       <div id="tolerances-accordion"></div>
 
@@ -551,9 +460,37 @@
       </div>
     </div>
 
-    </div>
+    <div class="panel-card">
+      <h2>Contacts utiles</h2>
 
-    <div class="profil-tab-panel" data-tab-panel="consentement-securite">
+      <div class="two-col">
+        <div class="form-row">
+          <label for="p-medecin-nom">Médecin / gastro-entérologue référent</label>
+          <input type="text" id="p-medecin-nom" placeholder="Nom du praticien">
+        </div>
+        <div class="form-row">
+          <label for="p-medecin-tel">Téléphone du médecin</label>
+          <input type="text" id="p-medecin-tel" placeholder="Ex : 01 23 45 67 89">
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="form-row">
+          <label for="p-urgence-nom">Contact d'urgence (proche)</label>
+          <input type="text" id="p-urgence-nom" placeholder="Nom du proche">
+        </div>
+        <div class="form-row">
+          <label for="p-urgence-tel">Téléphone du contact d'urgence</label>
+          <input type="text" id="p-urgence-tel" placeholder="Ex : 06 12 34 56 78">
+        </div>
+      </div>
+
+      <span class="form-error" id="contacts-error"></span>
+      <span class="form-success" id="contacts-success">✓ Contacts mis à jour.</span>
+      <div class="save-row">
+        <button type="button" class="btn btn-primary" id="contacts-save-btn">Enregistrer mes contacts</button>
+      </div>
+    </div>
 
     <div class="panel-card">
       <h2>Consentements</h2>
@@ -602,20 +539,14 @@
       </div>
     </div>
 
-    </div>
-
-    <div class="profil-tab-panel" data-tab-panel="suppression">
-
     <div class="panel-card danger-card">
-      <h2>Suppression du compte</h2>
+      <h2>Zone dangereuse</h2>
       <p>La suppression de ton compte est définitive et effacera tes données personnelles. Comme il s'agit d'une action sensible, ta demande sera d'abord enregistrée puis traitée manuellement pour confirmation.</p>
       <span class="form-error" id="delete-error"></span>
       <span class="form-success" id="delete-success">✓ Ta demande de suppression a bien été enregistrée. Tu vas être déconnecté·e.</span>
       <div class="save-row">
         <button type="button" class="btn btn-danger" id="delete-account-btn">Supprimer mon compte</button>
       </div>
-    </div>
-
     </div>
 
   </div>
@@ -661,31 +592,6 @@
   document.addEventListener('click', function(){
     document.querySelectorAll('.mega-item.open').forEach(function(i){ i.classList.remove('open'); });
   });
-
-  // Sous-navigation "Mon profil"
-  (function(){
-    const tabBtns = document.querySelectorAll('.profil-tab-btn');
-    const tabPanels = document.querySelectorAll('.profil-tab-panel');
-
-    function activateTab(target){
-      tabBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.tabTarget === target); });
-      tabPanels.forEach(function(p){ p.classList.toggle('active', p.dataset.tabPanel === target); });
-    }
-
-    tabBtns.forEach(function(btn){
-      btn.addEventListener('click', function(){
-        const target = btn.dataset.tabTarget;
-        activateTab(target);
-        history.replaceState(null, '', '#' + target);
-        btn.closest('.profil-tabs').scrollIntoView({ behavior:'smooth', block:'start' });
-      });
-    });
-
-    const initial = window.location.hash.replace('#', '');
-    if (initial && document.querySelector('.profil-tab-panel[data-tab-panel="' + initial + '"]')) {
-      activateTab(initial);
-    }
-  })();
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -699,327 +605,201 @@
       ['ail','Ail'], ['artichaut','Artichaut'], ['asperge_blanche','Asperge blanche'], ['asperge_verte','Asperge verte'],
       ['aubergine','Aubergine'], ['avocat','Avocat'], ['batavia','Batavia'], ['betterave_rouge','Betterave rouge'],
       ['brocoli','Brocoli'], ['carotte','Carotte'], ['celeri_branche','Céleri branche'], ['celeri_rave','Céleri-rave'],
-      ['cepes','Cèpes'], ['champignons_paris','Champignons de Paris'], ['champignons_noirs','Champignons noirs'], ['chou_blanc','Chou blanc'],
-      ['chou_chinois','Chou chinois / pak-choï'], ['choux_bruxelles','Chou de Bruxelles'], ['chou_frise','Chou frisé'], ['chou_kale','Chou kale'],
-      ['chou_pointu','Chou pointu'], ['chou_romanesco','Chou romanesco'], ['chou_rouge','Chou rouge'], ['chou_vert','Chou vert'],
-      ['chou_fleur','Chou-fleur'], ['citrouille','Citrouille'], ['coeurs_palmier','Cœurs de palmier'], ['concombre','Concombre'],
-      ['cotes_blettes','Côtes de blettes'], ['courge_butternut','Courge butternut'], ['courge_musquee','Courge musquée'], ['courge_spaghetti','Courge spaghetti'],
-      ['courgette','Courgette'], ['cresson','Cresson'], ['echalote','Échalote'], ['endives','Endives'],
-      ['epinards','Épinards'], ['fenouil','Fenouil'], ['germes_soja','Germes de soja / pousses'], ['girolles','Girolles'],
-      ['haricots_beurre','Haricots beurre'], ['haricots_plats','Haricots plats'], ['haricots_verts','Haricots verts'], ['laitue_iceberg','Laitue iceberg'],
-      ['laitue_romaine','Laitue romaine'], ['mache','Mâche'], ['mais','Maïs'], ['morilles','Morilles'],
-      ['navet','Navet'], ['oignon','Oignon'], ['panais','Panais'], ['patate_douce','Patate douce'],
+      ['cepes','Cèpes'], ['champignons_paris','Champignons de Paris'], ['champignons_noirs','Champignons noirs'],
+      ['chou_blanc','Chou blanc'], ['chou_chinois','Chou chinois / pak-choï'], ['choux_bruxelles','Chou de Bruxelles'],
+      ['chou_frise','Chou frisé'], ['chou_kale','Chou kale'], ['chou_pointu','Chou pointu'],
+      ['chou_romanesco','Chou romanesco'], ['chou_rouge','Chou rouge'], ['chou_vert','Chou vert'],
+      ['chou_fleur','Chou-fleur'], ['citrouille','Citrouille'], ['coeurs_palmier','Cœurs de palmier'],
+      ['concombre','Concombre'], ['cotes_blettes','Côtes de blettes'], ['courge_butternut','Courge butternut'],
+      ['courge_musquee','Courge musquée'], ['courge_spaghetti','Courge spaghetti'], ['courgette','Courgette'],
+      ['cresson','Cresson'], ['echalote','Échalote'], ['endives','Endives'], ['epinards','Épinards'],
+      ['fenouil','Fenouil'], ['germes_soja','Germes de soja / pousses'], ['girolles','Girolles'],
+      ['haricots_beurre','Haricots beurre'], ['haricots_plats','Haricots plats'], ['haricots_verts','Haricots verts'],
+      ['laitue_iceberg','Laitue iceberg'], ['laitue_romaine','Laitue romaine'], ['mache','Mâche'], ['mais','Maïs'],
+      ['morilles','Morilles'], ['navet','Navet'], ['oignon','Oignon'], ['panais','Panais'], ['patate_douce','Patate douce'],
       ['petits_pois','Petits pois'], ['piment_legume','Piment'], ['pleurotes','Pleurotes'], ['poireau','Poireau'],
-      ['pois_mange_tout','Pois mange-tout'], ['poivron_jaune','Poivron jaune'], ['poivron_rouge','Poivron rouge'], ['poivron_vert','Poivron vert'],
-      ['pomme_de_terre','Pomme de terre'], ['radis_noir','Radis noir'], ['radis_rouge','Radis rouge'], ['roquette','Roquette'],
-      ['rutabaga','Rutabaga'], ['salade_mesclun','Salade mesclun'], ['salade_chene_rouge','Salade feuille de chêne rouge'], ['salade_chene_verte','Salade feuille de chêne verte'],
-      ['salade_frisee','Salade frisée'], ['salade_sucrine','Salade sucrine'], ['salicorne','Salicorne'], ['salsifis','Salsifis'],
-      ['sauce_tomate','Sauce tomate / tomate cuite'], ['scarole','Scarole'], ['shiitake','Shiitake'], ['tomate_allongee','Tomate allongée'],
-      ['tomate_cerise','Tomate cerise'], ['tomate_coeur_de_boeuf','Tomate côtelée / cœur de bœuf'], ['tomate_grappe','Tomate grappe'], ['tomate_noire_crimee','Tomate noire de Crimée'],
-      ['tomate_ronde','Tomate ronde'], ['tomate_verte','Tomate verte'], ['topinambour','Topinambour'], ['truffes','Truffes'],
-      ['trompette_de_la_mort','Trompette de la mort'], ['chanterelle','Chanterelle'], ['bolet','Bolet'], ['pied_de_mouton','Pied de mouton'],
-      ['rose_des_pres','Rosé des prés'], ['enoki','Champignon enoki'], ['portobello','Champignon portobello'], ['mousseron','Mousseron'],
-      ['chayote','Chayote / Cristophine'], ['crosne','Crosne'], ['cardon','Cardon'], ['patisson','Pâtisson'],
-      ['chou_rave','Chou-rave'], ['igname','Igname'], ['manioc','Manioc'], ['taro','Taro'],
-      ['okra_gombo','Okra / gombo'], ['luffa','Luffa'], ['nopal','Nopal / Raquette de figuier de Barbarie'], ['daikon','Daikon / Radis blanc japonais'],
-      ['lotus_racine','Racine de lotus'], ['bardane','Racine de bardane (Gobo)'], ['bambou_pousses','Pousses de bambou'], ['wasabi_racine','Racine de wasabi fraîche'],
-      ['matsutake','Champignon Matsutake'], ['shimeji','Champignon Shimeji'], ['oreilles_de_juda','Oreilles de Juda'], ['reishi','Champignon Reishi'],
-      ['potimarron','Potimarron'], ['courge_kabocha','Courge Kabocha'], ['courge_delicata','Courge Delicata'], ['patisson_jaune','Pâtisson jaune'],
-      ['chou_palmiste','Chou palmiste'], ['chou_romano','Chou Romano'], ['jicama','Jícama'], ['chervis','Chervis'],
-      ['ortie','Feuilles d’ortie'], ['pissenlit_feuilles','Feuilles de pissenlit'], ['pourpier','Pourpier'], ['tetragone','Tétragone cornue'],
-      ['agretti','Agretti / Barba di frate'], ['tuberite_cerfeuil','Cerfeuil tubéreux'], ['heuchere','Salsifis d’Espagne / Scorsonère'], ['amarante_feuilles','Feuilles d’amarante (Callaloo)'],
-      ['potiron','Potiron'], ['giraumon','Giraumon'], ['poivron_orange','Poivron orange'], ['oignon_rouge','Oignon rouge'],
-      ['oignon_blanc','Oignon blanc'], ['oignon_jaune','Oignon jaune'], ['ciboule','Ciboule'], ['poireau_primeur','Poireau primeur'],
-      ['tomate_ancienne','Tomate ancienne'], ['tomate_green_zebra','Tomate green zebra'], ['blette_feuilles','Feuilles de blette (à distinguer des côtes)'], ['betterave_jaune','Betterave jaune'],
-      ['carotte_violette','Carotte violette'], ['artichaut_poivrade','Artichaut poivrade'], ['fond_artichaut','Fond d’artichaut'], ['piment_doux','Piment doux'],
-      ['raifort','Raifort'], ['aubergine_blanche','Aubergine blanche'], ['aubergine_violette','Aubergine violette (longue)'], ['choucroute','Choucroute (chou fermenté)'],
-      ['pak_choi_blanc','Pak-choï blanc'], ['brocolini','Brocolini']
+      ['pois_mange_tout','Pois mange-tout'], ['poivron_jaune','Poivron jaune'], ['poivron_rouge','Poivron rouge'],
+      ['poivron_vert','Poivron vert'], ['pomme_de_terre','Pomme de terre'], ['radis_noir','Radis noir'],
+      ['radis_rouge','Radis rouge'], ['roquette','Roquette'], ['rutabaga','Rutabaga'], ['salade_mesclun','Salade mesclun'],
+      ['salade_chene_rouge','Salade feuille de chêne rouge'], ['salade_chene_verte','Salade feuille de chêne verte'],
+      ['salade_frisee','Salade frisée'], ['salade_sucrine','Salade sucrine'], ['salicorne','Salicorne'],
+      ['salsifis','Salsifis'], ['sauce_tomate','Sauce tomate / tomate cuite'], ['scarole','Scarole'],
+      ['shiitake','Shiitake'], ['tomate_allongee','Tomate allongée'], ['tomate_cerise','Tomate cerise'],
+      ['tomate_coeur_de_boeuf','Tomate côtelée / cœur de bœuf'], ['tomate_grappe','Tomate grappe'],
+      ['tomate_noire_crimee','Tomate noire de Crimée'], ['tomate_ronde','Tomate ronde'], ['tomate_verte','Tomate verte'],
+      ['topinambour','Topinambour'], ['truffes','Truffes'], ['trompette_de_la_mort','Trompette de la mort'],
+      ['chanterelle','Chanterelle'], ['bolet','Bolet'], ['pied_de_mouton','Pied de mouton'], ['rose_des_pres','Rosé des prés'],
+      ['enoki','Champignon enoki'], ['portobello','Champignon portobello'], ['mousseron','Mousseron'],
+      ['chayote','Chayote'], ['crosne','Crosne'], ['cardon','Cardon'], ['patisson','Pâtisson'], ['chou_rave','Chou-rave'],
+      ['igname','Igname'], ['manioc','Manioc'], ['taro','Taro'], ['okra_gombo','Okra / gombo']
     ]},
     { title: 'Légumineuses', items: [
-      ['lentilles_vertes','Lentilles vertes'], ['lentilles_corail','Lentilles corail'], ['lentilles_noires','Lentilles noires (beluga)'], ['haricots_rouges','Haricots rouges'],
-      ['haricots_blancs','Haricots blancs'], ['haricots_noirs','Haricots noirs'], ['haricots_verts_secs','Haricots verts (secs)'], ['pois_chiches','Pois chiches'],
-      ['pois_casses','Pois cassés'], ['feves','Fèves'], ['soja','Soja / edamame'],
-      ['haricots_azuki','Haricots azuki'], ['lupin','Lupin'], ['haricots_mungo','Haricots mungo'], ['dolique','Dolique / pois à œil noir'],
-      ['haricots_coco','Haricots coco'], ['haricots_flageolets','Haricots flageolets'], ['lentilles_blondes','Lentilles blondes'],
-      ['lentilles_brunes','Lentilles brunes'], ['haricots_pinto','Haricots pinto'], ['haricots_tarbais','Haricots tarbais'], ['haricots_lima','Haricots de Lima / Gros haricots cuivrés'],
-      ['haricots_borlotti','Haricots Borlotti / Cranberry'], ['haricots_canellini','Haricots Cannellini'], ['pois_pigeon','Pois pigeon / Toor dal'], ['urad_dal','Urad dal / Lentilles noires décortiquées'],
-      ['chana_dal','Chana dal'], ['mung_dal','Mung dal'], ['gesses','Gesses / Pois carrés'], ['lupin_blanc','Lupin blanc doux'],
-      ['haricots_tepary','Haricots Tepary'], ['haricots_marrons','Haricots marrons d’Espagne'], ['pois_sabre','Pois sabre'], ['houmous','Houmous'],
-      ['dhal_lentilles','Dhal de lentilles (plat)']
+      ['lentilles_vertes','Lentilles vertes'], ['lentilles_corail','Lentilles corail'], ['lentilles_noires','Lentilles noires (beluga)'],
+      ['haricots_rouges','Haricots rouges'], ['haricots_blancs','Haricots blancs'], ['haricots_noirs','Haricots noirs'],
+      ['haricots_verts_secs','Haricots verts (secs)'], ['pois_chiches','Pois chiches'], ['pois_casses','Pois cassés'],
+      ['petits_pois','Petits pois'], ['feves','Fèves'], ['soja','Soja / edamame'], ['haricots_azuki','Haricots azuki'],
+      ['lupin','Lupin'], ['haricots_mungo','Haricots mungo'], ['dolique','Dolique / pois à œil noir'],
+      ['pois_mange_tout','Pois mange-tout'], ['haricots_coco','Haricots coco'], ['haricots_flageolets','Haricots flageolets'],
+      ['lentilles_blondes','Lentilles blondes']
     ]},
     { title: 'Fruits à coque et graines', items: [
       ['noix','Noix'], ['amandes','Amandes'], ['noisettes','Noisettes'], ['noix_cajou','Noix de cajou'],
-      ['pistaches','Pistaches'], ['noix_pecan','Noix de pécan'], ['noix_bresil','Noix du Brésil'], ['noix_macadamia','Noix de macadamia'],
-      ['chataignes','Châtaignes'], ['cacahuetes','Cacahuètes / arachides'], ['graines_lin','Graines de lin'], ['graines_chia','Graines de chia'],
-      ['graines_sesame','Graines de sésame'], ['graines_tournesol','Graines de tournesol'], ['graines_courge','Graines de courge'], ['pignons','Pignons de pin'],
-      ['noix_pili','Noix de Pili'], ['noix_ginkgo','Noix de Ginkgo'], ['noix_pain','Noix de pain / Brosimum'], ['graines_chanvre','Graines de chanvre'],
-      ['graines_pavot','Graines de pavot'], ['graines_nigelle','Graines de nigelle'], ['graines_courge_hulless','Graines de courge décortiquées'], ['noix_kola','Noix de cola'],
-      ['chataigne_eau','Châtaigne d’eau douce'], ['pignons_cedre','Pignons de cèdre de Sibérie'], ['graines_pastéque','Graines de pastèque séchées (Egusi)'], ['noix_de_grecque','Noix d’Arec / Betel'],
-      ['graines_basilic','Graines de basilic (Sabja)'], ['graines_sacha_inchi','Graines de Sacha Inchi']
+      ['pistaches','Pistaches'], ['noix_pecan','Noix de pécan'], ['noix_bresil','Noix du Brésil'],
+      ['noix_macadamia','Noix de macadamia'], ['chataignes','Châtaignes'], ['cacahuetes','Cacahuètes / arachides'],
+      ['graines_lin','Graines de lin'],
+      ['graines_chia','Graines de chia'], ['graines_sesame','Graines de sésame'],
+      ['graines_tournesol','Graines de tournesol'], ['graines_courge','Graines de courge'], ['pignons','Pignons de pin']
     ]},
-    { title: 'Céréales, farines et dérivés', items: [
-      ['pain_complet','Pain complet'], ['pain_multicereales','Pain multicéréales'], ['pain_seigle','Pain de seigle'], ['riz_complet','Riz complet'],
-      ['riz_sauvage','Riz sauvage'], ['avoine','Avoine / flocons d’avoine'], ['quinoa','Quinoa'], ['orge','Orge perlé'],
-      ['epeautre','Épeautre'], ['boulgour','Boulgour'], ['sarrasin','Sarrasin'], ['millet','Millet'],
-      ['freekeh','Freekeh'], ['son_de_ble','Son de blé'], ['muesli','Muesli complet'], ['pates_completes','Pâtes complètes'],
-      ['semoule_complete','Semoule complète'], ['riz_blanc','Riz blanc'], ['riz_rouge','Riz rouge'], ['riz_thai','Riz thaï / jasmin'],
-      ['riz_basmati','Riz basmati'], ['semoule_ble','Semoule de blé'], ['semoule_ble_dur','Semoule de blé dur'], ['pates_fraiches','Pâtes fraîches'],
-      ['nouilles_asiatiques','Nouilles asiatiques'], ['pates_classiques','Pâtes classiques'], ['polenta','Polenta'], ['seigle','Seigle'],
-      ['vermicelles_riz','Vermicelles de riz'], ['teff','Teff'], ['fonio','Fonio'], ['amarante','Amarante'],
-      ['petit_epeautre','Engrain / Petit épeautre'], ['kamut','Khorasan / Kamut'], ['sorgho','Sorgho'], ['riz_gluant','Riz gluant / Riz doux'],
-      ['riz_noir_venere','Riz noir Vénéré'], ['riz_arborio','Riz Arborio'], ['riz_carnaroli','Riz Carnaroli'], ['son_avoine','Son d’avoine'],
-      ['son_riz','Son de riz'], ['tapioca','Tapioca / Perles de japon'], ['sago','Sagou'], ['farro','Farro italien'],
-      ['nouilles_soba','Nouilles Soba (sarrasin)'], ['nouilles_udon','Nouilles Udon'], ['nouilles_ramen','Nouilles Ramen'], ['farine_t45','Farine de blé T45/T55'],
-      ['farine_t80','Farine de blé T80/T110'], ['farine_t150','Farine intégrale T150'], ['farine_pois_chiche','Farine de pois chiche'], ['farine_chataigne','Farine de châtaigne'],
-      ['farine_coco','Farine de coco'], ['farine_riz','Farine de riz'], ['farine_mais','Farine de maïs / Harina de maíz (Maseca)'], ['farine_patate_douce','Farine de patate douce'],
-      ['pain_blanc','Pain blanc'], ['pain_de_mie','Pain de mie'], ['baguette','Baguette'], ['pain_sans_gluten','Pain sans gluten'],
-      ['biscottes','Biscottes / cracottes'], ['corn_flakes_nature','Corn flakes nature'], ['galette_riz_soufflee','Galette de riz soufflé'], ['couscous_semoule_roulee','Couscous (semoule roulée)']
+    { title: 'Céréales complètes et son', items: [
+      ['pain_complet','Pain complet'], ['pain_multicereales','Pain multicéréales'], ['pain_seigle','Pain de seigle'],
+      ['riz_complet','Riz complet'], ['riz_sauvage','Riz sauvage'], ['avoine','Avoine / flocons d\u2019avoine'],
+      ['quinoa','Quinoa'], ['orge','Orge perlé'], ['epeautre','Épeautre'], ['boulgour','Boulgour'],
+      ['sarrasin','Sarrasin'], ['millet','Millet'], ['freekeh','Freekeh'], ['son_de_ble','Son de blé'],
+      ['muesli','Muesli complet'], ['pates_completes','Pâtes complètes'], ['semoule_complete','Semoule complète'],
+      ['riz_blanc','Riz blanc'], ['riz_rouge','Riz rouge'], ['riz_thai','Riz thaï / jasmin'], ['riz_basmati','Riz basmati'],
+      ['semoule_ble','Semoule de blé'], ['semoule_ble_dur','Semoule de blé dur'], ['pates_fraiches','Pâtes fraîches'],
+      ['nouilles_asiatiques','Nouilles asiatiques'], ['pates_classiques','Pâtes classiques'], ['polenta','Polenta'],
+      ['seigle','Seigle'], ['vermicelles_riz','Vermicelles de riz']
     ]},
     { title: 'Fruits', items: [
       ['fraises','Fraises'], ['framboises','Framboises'], ['myrtilles','Myrtilles'], ['mures','Mûres'],
       ['groseilles','Groseilles'], ['cassis','Cassis'], ['airelles','Airelles'], ['cranberries','Cranberries'],
-      ['cerises','Cerises'], ['kiwi','Kiwi'], ['ananas','Ananas'], ['mangue','Mangue'],
-      ['papaye','Papaye'], ['litchi','Litchi'], ['goyave','Goyave'], ['jacquier','Fruit du jacquier'],
-      ['figue_de_barbarie','Figue de Barbarie'], ['banane','Banane'], ['banane_plantain','Banane plantain'], ['fruit_de_la_passion','Fruit de la passion / Maracudja'],
-      ['noix_de_coco','Noix de coco fraîche'], ['orange','Orange'], ['clementine_mandarine','Clémentine / mandarine'], ['pamplemousse','Pamplemousse'],
-      ['pomelo','Pomelo'], ['citron','Citron / citron vert'], ['pomme','Pomme'], ['pomme_peau','Pomme avec la peau'],
-      ['pomme_gala','Pomme Gala'], ['pomme_golden','Pomme Golden'], ['pomme_granny','Pomme Granny Smith'], ['pomme_pink_lady','Pomme Pink Lady'],
+      ['cerises','Cerises'], ['kiwi','Kiwi'], ['ananas','Ananas'], ['mangue','Mangue'], ['papaye','Papaye'],
+      ['litchi','Litchi'], ['goyave','Goyave'], ['jacquier','Fruit du jacquier'], ['figue_de_barbarie','Figue de Barbarie'],
+      ['banane','Banane'], ['banane_plantain','Banane plantain'], ['fruit_de_la_passion','Fruit de la passion'],
+      ['noix_de_coco','Noix de coco fraîche'], ['orange','Orange'], ['clementine_mandarine','Clémentine / mandarine'],
+      ['pamplemousse','Pamplemousse'], ['pomelo','Pomelo'], ['citron','Citron / citron vert'],
+      ['pomme','Pomme'], ['pomme_peau','Pomme avec la peau'], ['pomme_gala','Pomme Gala'], ['pomme_golden','Pomme Golden'],
+      ['pomme_granny','Pomme Granny Smith'], ['pomme_pink_lady','Pomme Pink Lady'],
       ['poire','Poire'], ['poire_peau','Poire avec la peau'], ['poire_conference','Poire Conférence'], ['poire_williams','Poire Williams'],
-      ['nectarine','Nectarine'], ['peche_blanche','Pêche blanche'], ['peche_jaune','Pêche jaune'], ['abricot','Abricot'],
-      ['prune','Prune'], ['mirabelles','Mirabelles'], ['reines_claudes','Reines-claudes'], ['raisin_blanc','Raisin blanc'],
-      ['raisin_noir','Raisin noir'], ['raisin_chasselas','Raisin Chasselas'], ['pruneaux','Pruneaux'], ['figues_fraiches','Figues fraîches'],
+      ['nectarine','Nectarine'], ['peche_blanche','Pêche blanche'], ['peche_jaune','Pêche jaune'],
+      ['abricot','Abricot'], ['prune','Prune'], ['mirabelles','Mirabelles'], ['reines_claudes','Reines-claudes'],
+      ['raisin_blanc','Raisin blanc'], ['raisin_noir','Raisin noir'], ['raisin_chasselas','Raisin Chasselas'],
+      ['pruneaux','Pruneaux'], ['figues_fraiches','Figues fraîches'],
       ['melon_pasteque','Melon / pastèque'], ['dattes','Dattes'], ['coing','Coing'], ['grenade','Grenade'],
       ['kaki','Kaki'], ['physalis','Physalis'], ['rhubarbe','Rhubarbe'], ['pitaya','Pitaya / fruit du dragon'],
-      ['baies_de_goji','Baies de goji'], ['ramboutan','Ramboutan'], ['mangoustan','Mangoustan'], ['durian','Durian'],
-      ['longane','Longane'], ['carambole','Carambole'], ['corossol','Corossol / Graviola'], ['kumquat','Kumquat'],
-      ['yuzu','Yuzu'], ['combava_fruit','Combava (fruit)'], ['calamansi','Calamansi'], ['hand_of_buddha','Main de Bouddha'],
-      ['feijoa','Feijoa / Guayabo'], ['tamarillo','Tamarillo / Tomate d’arbre'], ['kiwano','Kiwano / Melon métulifer'], ['salak','Salak / Fruit serpent'],
-      ['sapote','Sapote noire / Sapotille'], ['cherimoya','Chérimole / Cherimoya'], ['jabuticaba','Jabuticaba'], ['nashi','Poire Nashi'],
-      ['argousier','Baies d’argousier'], ['sureau','Baies de sureau'], ['amla','Amla / Groseille indienne'], ['jujube','Jujube / Datte chinoise'],
-      ['tamarind','Tamarin'], ['mure_arbre','Mûre de mûrier (Platane/Noir)'], ['nefle','Nèfles du Japon / Bibacier'], ['corneille','Cormes / Fruits du cormier'],
-      ['azerole','Azéroles'], ['santol','Santol'], ['langsat','Langsat / Duku'], ['marang','Marang'],
-      ['ackee','Aki / Pomme d’akée'], ['compote_pomme','Compote de pomme'], ['compote_sans_sucre','Compote sans sucre ajouté'], ['fruits_au_sirop','Fruits au sirop (conserve)']
+      ['baies_de_goji','Baies de goji']
     ]},
     { title: 'Viandes et œufs', items: [
       ['boeuf','Bœuf'], ['veau','Veau'], ['porc','Porc'], ['agneau_mouton','Agneau / mouton'],
-      ['poulet','Poulet'], ['dinde','Dinde'], ['canard','Canard'], ['lapin','Lapin'],
-      ['gibier','Gibier'], ['saucisse','Saucisse'], ['jambon','Jambon'], ['viande_grasse','Viande grasse en général'],
-      ['abats','Abats'], ['oeufs','Œufs de poule'], ['chevreau','Chevreau'], ['chevreuil','Chevreuil'],
-      ['cerf','Cerf'], ['sanglier','Sanglier'], ['oeufs_caille','Œufs de caille'], ['oeufs_cane','Œufs de cane'],
-      ['oeufs_oie','Œufs d’oie'], ['oie','Oie'], ['pigeon','Pigeon'], ['caille','Caille'],
-      ['faisan','Faisan'], ['perdrix','Perdrix'], ['pintade','Pintade'], ['chameau','Viande de chameau / dromadaire'],
-      ['renne','Renne / Élan'], ['bison','Bison'], ['kangourou','Kangourou'], ['autruche','Autruche'],
-      ['oeuf_autruche','Œuf d’autruche'], ['boeuf_kobe','Bœuf de Wagyu / Kobe'], ['langue_boeuf','Langue de bœuf'], ['foie_de_veau','Foie de veau'],
-      ['rognons','Rognons'], ['tripes','Tripes / Ris de veau'], ['moelle_osseuse','Moëlle osseuse'], ['viande_cheval','Viande de cheval'],
-      ['guinea_pig','Cochon d’Inde (Cuy)'], ['mutton_capra','Chèvre adulte'], ['ris_de_veau_cuisine','Ris de veau (préparation)']
+      ['poulet','Poulet'], ['dinde','Dinde'], ['canard','Canard'], ['lapin','Lapin'], ['gibier','Gibier'],
+      ['saucisse','Saucisse'], ['jambon','Jambon'], ['viande_grasse','Viande grasse en général'],
+      ['abats','Abats'], ['oeufs','Œufs'], ['chevreau','Chevreau'], ['chevreuil','Chevreuil'], ['cerf','Cerf'],
+      ['sanglier','Sanglier'], ['oeufs_caille','Œufs de caille'], ['oeufs_cane','Œufs de cane'], ['oeufs_oie','Œufs d\u2019oie']
     ]},
-    { title: 'Charcuterie et viandes séchées', items: [
-      ['jambon_cru','Jambon cru'], ['jambon_blanc','Jambon blanc / cuit'], ['saucisson','Saucisson'], ['pate','Pâté'],
-      ['boudin_noir','Boudin noir'], ['boudin_blanc','Boudin blanc'], ['rillettes','Rillettes'], ['chorizo','Chorizo'],
-      ['salami','Salami'], ['merguez','Merguez'], ['bacon','Bacon / lardons'], ['prosciutto','Prosciutto di Parma / San Daniele'],
-      ['coppa','Coppa'], ['pancetta','Pancetta'], ['bresaola','Bresaola'], ['viande_des_grisons','Viande des Grisons'],
-      ['pastrami','Pastrami'], ['mortadelle','Mortadella Bologna'], ['soppressata','Soppressata'], ['lardo_di_colonnata','Lardo di Colonnata'],
-      ['guanciale','Guanciale'], ['jambon_iberique','Jambon Ibérique (Pata Negra)'], ['cecina','Cecina de León'], ['figatellu','Figatellu Corsica'],
-      ['andouille','Andouille de Guémené'], ['andouillette','Andouillette AAAAA'], ['head_cheese','Fromage de tête / Hure'], ['galantine','Galantine / Ballottine'],
-      ['sujuk','Sujuk / Sucuk (turc)'], ['jamon_serrano','Jambon Serrano'], ['kabanos','Kabanos (polonais)'], ['landjaeger','Landjäger'],
-      ['biltong','Biltong (Afrique du Sud)'], ['beef_jerky','Beef Jerky'], ['carne_de_sol','Carne de sol / Carne seca'], ['lap_cheong','Saucisse chinoise (Lap Cheong)'],
-      ['mettwurst','Mettwurst'], ['teewurst','Teewurst'], ['saucisse_toulouse','Saucisse de Toulouse'], ['foie_gras','Foie gras']
+    { title: 'Charcuterie', items: [
+      ['jambon_cru','Jambon cru'], ['jambon_blanc','Jambon blanc / cuit'], ['saucisson','Saucisson'],
+      ['pate','Pâté'], ['boudin_noir','Boudin noir'], ['boudin_blanc','Boudin blanc'], ['rillettes','Rillettes'],
+      ['chorizo','Chorizo'], ['salami','Salami'], ['merguez','Merguez'], ['bacon','Bacon / lardons']
     ]},
-    { title: 'Matières grasses et huiles', items: [
-      ['huile_olive','Huile d’olive'], ['huile_tournesol','Huile de tournesol'], ['huile_colza','Huile de colza'], ['huile_coco','Huile de coco'],
-      ['huile_sesame','Huile de sésame'], ['huile_poisson','Huile de poisson'], ['margarine','Margarine'], ['graisse_canard','Graisse de canard'],
-      ['graisse_oie','Graisse d’oie'], ['saindoux','Saindoux'], ['ghee','Ghee / Beurre clarifié'], ['huile_avocat','Huile d’avocat'],
-      ['huile_noix','Huile de noix'], ['huile_noisette','Huile de noisette'], ['huile_pepins_raisin','Huile de pépins de raisin'], ['huile_argan','Huile d’argan alimentaire'],
-      ['huile_lin','Huile de lin'], ['huile_arachide','Huile d’arachide'], ['huile_palme','Huile de palme'], ['beurre_recuit','Beurre noir / Beurre noisette'],
-      ['beurre_de_cacao','Beurre de cacao'], ['huile_chanvre','Huile de chanvre'], ['graisse_cheval','Graisse de cheval'], ['suet','Suet (Graisse de rognons de bœuf)'],
-      ['huile_pimentee','Huile pimentée / Chili oil'], ['huile_moutarde','Huile de moutarde'], ['huile_soja','Huile de soja'], ['huile_germes_ble','Huile de germe de blé']
+    { title: 'Matières grasses', items: [
+      ['huile_olive','Huile d\u2019olive'], ['huile_tournesol','Huile de tournesol'], ['huile_colza','Huile de colza'],
+      ['huile_coco','Huile de coco'], ['huile_sesame','Huile de sésame'], ['huile_poisson','Huile de poisson'],
+      ['margarine','Margarine'], ['graisse_canard','Graisse de canard'], ['graisse_oie','Graisse d\u2019oie'],
+      ['saindoux','Saindoux']
     ]},
-    { title: 'Protéines végétales et alternatives', items: [
+    { title: 'Protéines végétales', items: [
       ['tofu','Tofu nature'], ['tofu_soyeux','Tofu soyeux'], ['tofu_fume','Tofu fumé'], ['tempeh','Tempeh'],
-      ['seitan','Seitan'], ['proteines_soja_texturees','Protéines de soja texturées'], ['falafels','Falafels'], ['steak_vegetal','Steak végétal'],
-      ['nuggets_vegetaux','Nuggets végétaux'], ['cordon_bleu_vegetal','Cordon-bleu végétal'], ['saucisse_vegetale','Saucisse végétale'], ['galette_vegetale','Galette végétale (pois, céréales...)'],
-      ['haché_vegetal','Haché végétal'], ['natto','Nattō (soja fermenté)'], ['yuba','Yuba (peau de tofu)'], ['proteine_pois','Protéine de pois texturée'],
-      ['mycoproteine','Mycoprotéine (Quorn)'], ['tvp','Protéines végétales déshydratées'], ['vromage','Faux-mage / Fromage végétal'], ['lait_vegetal','Lait végétal général'],
-      ['oeuf_vegetal','Substitut d’œuf végétal'], ['lait_riz','Lait de riz'], ['lait_noisette','Lait de noisette'], ['yaourt_soja','Yaourt au soja']
+      ['seitan','Seitan'], ['proteines_soja_texturees','Protéines de soja texturées'], ['falafels','Falafels'],
+      ['steak_vegetal','Steak végétal'], ['nuggets_vegetaux','Nuggets végétaux'], ['cordon_bleu_vegetal','Cordon-bleu végétal'],
+      ['saucisse_vegetale','Saucisse végétale'], ['galette_vegetale','Galette végétale (pois, céréales...)'],
+      ['haché_vegetal','Haché végétal']
     ]},
-    { title: 'Condiments, sauces et fermentations', items: [
-      ['moutarde_douce','Moutarde douce'], ['mayonnaise','Mayonnaise'], ['vinaigre_balsamique','Vinaigre balsamique'], ['vinaigre_vin','Vinaigre de vin'],
-      ['vinaigre_cidre','Vinaigre de cidre'], ['sauce_soja','Sauce soja'], ['cornichons','Cornichons'], ['câpres','Câpres'],
-      ['olives','Olives'], ['bouillon_legumes','Bouillon de légumes (cube/industriel)'], ['bouillon_volaille','Bouillon de volaille (cube/industriel)'], ['bouillon_boeuf','Bouillon de bœuf (cube/industriel)'],
-      ['tamari','Sauce Tamari (sans gluten)'], ['shoyu','Sauce Shoyu'], ['miso_blanc','Miso blanc (Shiro miso)'], ['miso_rouge','Miso rouge (Aka miso)'],
-      ['mirin','Mirin'], ['vinaigre_riz','Vinaigre de riz'], ['sauce_poisson','Sauce poisson / Nuoc-mâm'], ['sauce_huitre','Sauce d’huître'],
-      ['sauce_worcestershire','Sauce Worcestershire'], ['sriracha','Sauce Sriracha'], ['sauce_hp','Sauce HP'], ['chutney','Chutney (mangue, figue...)'],
-      ['tahini','Tahini / Purée de sésame'], ['harissa_berbere','Harissa artisanale'], ['kimchi','Kimchi fermenté'], ['sauce_satos','Sauce Ponzu'],
-      ['levure_maltée','Levure diététique / maltée'], ['katsuobushi','Bonite séchée en flocons (Katsuobushi)'], ['gochujang','Pâte de piment coréenne (Gochujang)'], ['doenjang','Pâte de soja coréenne (Doenjang)'],
-      ['sauce_samba','Sambal Oelek'], ['sauce_hoisin','Sauce Hoisin'], ['sauce_prune','Sauce prune chinoise'], ['sauce_pesto','Pesto verde / rosso'],
-      ['sauce_tzatziki','Tzatziki'], ['chimichurri','Sauce Chimichurri'], ['sauce_bbq','Sauce Barbecue'], ['sauce_ketchup','Ketchup'],
-      ['sauce_tartare','Sauce Tartare'], ['sauce_bearnaise','Sauce Béarnaise'], ['sauce_hollandaise','Sauce Hollandaise'], ['sel','Sel'],
-      ['sel_fin','Sel fin'], ['gros_sel','Gros sel'], ['bicarbonate_soude','Bicarbonate de soude'], ['moutarde_ancienne','Moutarde à l’ancienne'],
-      ['beurre_cacahuete','Beurre de cacahuète'], ['beurre_amande','Beurre d’amande'], ['puree_noisette','Purée de noisette']
+    { title: 'Condiments et aides culinaires', items: [
+      ['moutarde_douce','Moutarde douce'], ['mayonnaise','Mayonnaise'], ['vinaigre_balsamique','Vinaigre balsamique'],
+      ['vinaigre_vin','Vinaigre de vin'], ['vinaigre_cidre','Vinaigre de cidre'], ['sauce_soja','Sauce soja'],
+      ['cornichons','Cornichons'], ['câpres','Câpres'], ['olives','Olives'],
+      ['bouillon_legumes','Bouillon de légumes (cube/industriel)'], ['bouillon_volaille','Bouillon de volaille (cube/industriel)'],
+      ['bouillon_boeuf','Bouillon de bœuf (cube/industriel)']
     ]},
-    { title: 'Poissons, fruits de mer et conserves marines', items: [
+    { title: 'Poissons et fruits de mer', items: [
       ['saumon','Saumon'], ['saumon_fume','Saumon fumé'], ['maquereau','Maquereau'], ['sardine','Sardine'],
       ['anchois','Anchois'], ['thon','Thon'], ['cabillaud_morue','Cabillaud / morue'], ['sole','Sole'],
-      ['truite','Truite'], ['hareng','Hareng'], ['dorade','Dorade'], ['bar','Bar / loup'],
-      ['colin','Colin'], ['turbot','Turbot'], ['brochet','Brochet'], ['merlu','Merlu'],
-      ['crevettes','Crevettes'], ['langoustine','Langoustine'], ['ecrevisse','Écrevisse'], ['moules','Moules'],
-      ['huitres','Huîtres'], ['bulots','Bulots'], ['bigorneaux','Bigorneaux'], ['palourdes','Palourdes'],
-      ['coques','Coques'], ['coquilles_st_jacques','Coquilles Saint-Jacques'], ['crabe','Crabe'], ['homard_langouste','Homard / langouste'],
-      ['poulpe','Poulpe'], ['calmar','Calmar'], ['seiche','Seiche'], ['rouget','Rouget'],
-      ['lieu_jaune_noir','Lieu jaune / noir'], ['flétan','Flétan'], ['espadon','Espadon'], ['anguille','Anguille'],
-      ['lotte','Lotte / baudroie'], ['vive','Vive'], ['rascasse','Rascasse'], ['congre','Congre'],
-      ['raie','Raie'], ['tacaud','Tacaud'], ['sabre','Sabre'], ['saint_pierre','Saint-Pierre'],
-      ['ormeaux','Ormeaux'], ['praires','Praires'], ['couteaux','Couteaux'], ['oursins','Oursins'],
-      ['caviar','Caviar / Œufs d’esturgeon'], ['oeufs_saumon','Œufs de saumon / Ikura'], ['oeufs_lump','Œufs de lump'], ['poutargue','Poutargue / Boutargue'],
-      ['surimi','Surimi'], ['mahi_mahi','Mahi-Mahi / Dorade coryphène'], ['sanma','Sanma / Saury du Japon'], ['tilapia','Tilapia'],
-      ['pangasius','Pangasius'], ['perche_du_nil','Perche du Nil'], ['silure','Silure'], ['omble_chevalier','Omble chevalier'],
-      ['tourteau','Tourteau'], ['araignee_de_mer','Araignée de mer'], ['gambas','Gambas géantes'], ['morue_salee','Bacalao / Morue salée séchée'],
-      ['surstroemming','Surströmming (Hareng fermenté)'], ['anchois_marines','Anchois marinés au vinaigre (Boquerones)'], ['kokotxas','Kokotxas de merlu/cabillaud'], ['brandade','Brandade de morue']
+      ['truite','Truite'], ['hareng','Hareng'], ['dorade','Dorade'], ['bar','Bar / loup'], ['colin','Colin'],
+      ['turbot','Turbot'], ['brochet','Brochet'], ['merlu','Merlu'],
+      ['crevettes','Crevettes'], ['langoustine','Langoustine'], ['ecrevisse','Écrevisse'],
+      ['moules','Moules'], ['huitres','Huîtres'], ['bulots','Bulots'], ['bigorneaux','Bigorneaux'],
+      ['palourdes','Palourdes'], ['coques','Coques'], ['coquilles_st_jacques','Coquilles Saint-Jacques'],
+      ['crabe','Crabe'], ['homard_langouste','Homard / langouste'], ['poulpe','Poulpe'], ['calmar','Calmar'], ['seiche','Seiche'],
+      ['rouget','Rouget'], ['lieu_jaune_noir','Lieu jaune / noir'], ['flétan','Flétan'], ['espadon','Espadon'],
+      ['anguille','Anguille'], ['lotte','Lotte / baudroie'], ['vive','Vive'], ['rascasse','Rascasse'], ['congre','Congre'],
+      ['raie','Raie'], ['tacaud','Tacaud'], ['sabre','Sabre'], ['saint_pierre','Saint-Pierre'], ['ormeaux','Ormeaux'],
+      ['praires','Praires'], ['couteaux','Couteaux'], ['oursins','Oursins']
     ]},
-    { title: 'Produits laitiers et Fromages du Monde', items: [
-      ['lait_vache','Lait de vache (entier/écrémé)'], ['lait_chevre','Lait de chèvre'], ['lait_brebis','Lait de brebis'], ['lait_jument','Lait de jument'],
-      ['lait_anesse','Lait d’ânesse'], ['lait_chamelle','Lait de chamelle'], ['lait_bufflonne','Lait de bufflonne'], ['lait_yack','Lait de yak'],
-      ['lait_concentre','Lait concentré sucré/non sucré'], ['yaourt','Yaourt nature'], ['kefir','Kéfir de lait'], ['skyr','Skyr islandais'],
-      ['labneh','Labneh (moyen-orient)'], ['ayran','Ayran / Doogh'], ['creme_fraiche','Crème fraîche épaisse/liquide'], ['creme_fleurette','Crème fleurette'],
-      ['mascarpone','Mascarpone'], ['ricotta','Ricotta'], ['beurre','Beurre doux/demi-sel'],
-      ['roquefort','Roquefort AOP'], ['comte','Comté AOP'], ['camembert','Camembert de Normandie AOP'], ['brie_meaux','Brie de Meaux AOP'],
-      ['brie_melun','Brie de Melun AOP'], ['reblochon','Reblochon AOP'], ['munster','Munster AOP'], ['epoisses','Époisses AOP'],
-      ['cantal','Cantal AOP'], ['saint_nectaire','Saint-Nectaire AOP'], ['beaufort','Beaufort AOP'], ['emmental_grand_cru','Emmental Français Grand Cru'],
-      ['crottin_chavignol','Crottin de Chavignol AOP'], ['morbier','Morbier AOP'], ['livarot','Livarot AOP'], ['pont_leveque','Pont-l’Évêque AOP'],
-      ['tomme_savoie','Tomme de Savoie AOP'], ['bleu_auvergne','Bleu d’Auvergne AOP'], ['fourme_ambert','Fourme d’Ambert AOP'], ['maroilles','Maroilles AOP'],
-      ['neufchatel','Neufchâtel AOP'], ['coulommiers','Coulommiers'], ['chaource','Chaource AOP'], ['ossau_iraty','Ossau-Iraty AOP'],
-      ['cancoillotte','Cancoillotte'], ['saint_marcellin','Saint-Marcellin IGP'], ['saint_felicien','Saint-Félicien'], ['vacherin_mont_dor','Mont d’Or / Vacherin du Haut-Doubs AOP'],
-      ['salers','Salers AOP'], ['laguiole','Laguiole AOP'], ['abondance','Abondance AOP'], ['tome_des_bauges','Tome des Bauges AOP'],
-      ['bleu_des_causses','Bleu des Causses AOP'], ['bleu_gex','Bleu de Gex AOP'], ['fourme_montbrison','Fourme de Montbrison AOP'], ['chabichou_poitou','Chabichou du Poitou AOP'],
-      ['sainte_maure_touraine','Sainte-Maure de Touraine AOP'], ['selles_sur_cher','Selles-sur-Cher AOP'], ['valencay','Valençay AOP'], ['pouligny_saint_pierre','Pouligny-Saint-Pierre AOP'],
-      ['mothais_sur_feuille','Mothais sur feuille'], ['banon','Banon AOP'], ['picodon','Picodon AOP'], ['pélardon','Pélardon AOP'],
-      ['rigotte_condrieu','Rigotte de Condrieu AOP'], ['rocamadour','Rocamadour AOP'], ['brocciu','Brocciu Corsica AOP'], ['tome_corse','Tome Corse'],
-      ['bleu_du_vercors','Bleu du Vercors-Sassenage AOP'], ['langres','Langres AOP'], ['soumaintrain','Soumaintrain IGP'], ['trou_du_cru','Trou du Cru'],
-      ['affidelice','Affidélice'], ['brillat_savarin','Brillat-Savarin IGP'], ['exploration','L’Explorateur'], ['saint_albry','Saint Albry'],
-      ['chaumes','Chaumes'], ['etorki','Etorki'], ['fol_epic','Fol Épi'], ['port_salut','Port-Salut'],
-      ['mimolette_vieille','Mimolette Vieille / Boule de Lille'], ['parmesan','Parmigiano Reggiano AOP'], ['grana_padano','Grana Padano AOP'], ['pecorino_romano','Pecorino Romano AOP'],
-      ['pecorino_sardo','Pecorino Sardo AOP'], ['pecorino_toscano','Pecorino Toscano AOP'], ['gorgonzola','Gorgonzola AOP'], ['mozzarella_di_bufala','Mozzarella di Bufala Campana AOP'],
-      ['mozzarella_fior_di_latte','Mozzarella Fior di Latte'], ['burrata','Burrata di Andria IGP'], ['stracciatella','Stracciatella'], ['provolone_valpadana','Provolone Valpadana AOP'],
-      ['caciocavallo','Caciocavallo Silano AOP'], ['fontina','Fontina AOP'], ['taleggio','Taleggio AOP'], ['asiago','Asiago AOP'],
-      ['castelmagno','Castelmagno AOP'], ['robiole','Robiola di Roccaverano AOP'], ['scamorza','Scamorza affumicata'], ['ubriaco','Formaggio Ubriaco'],
-      ['bel_paese','Bel Paese'], ['ricotta_salata','Ricotta Salata'], ['gruyere_suisse','Gruyère AOP Suisse'], ['appenzeller','Appenzeller'],
-      ['tête_de_moine','Tête de Moine AOP'], ['vacherin_fribourgeois','Vacherin Fribourgeois AOP'], ['sbrinz','Sbrinz AOP'], ['raclette_du_valais','Raclette du Valais AOP'],
-      ['tilsiter_suisse','Tilsiter Suisse'], ['l_etivaz','L’Etivaz AOP'], ['lopenzo','Schabziger / Sapsago'], ['manchego','Queso Manchego AOP'],
-      ['cabrales','Queso de Cabrales AOP'], ['tetilla','Queso Tetilla AOP'], ['idiazabal','Idiazábal AOP'], ['mahon','Mahón-Menorca AOP'],
-      ['zamorano','Queso Zamorano AOP'], ['roncal','Queso Roncal AOP'], ['garrotxa','Garrotxa'], ['majorero','Majorero AOP'],
-      ['queijo_da_serra','Queijo Serra da Estrela (Portugal)'], ['queijo_de_azeitão','Queijo de Azeitão (Portugal)'], ['queijo_são_jorge','Queijo São Jorge (Portugal)'], ['cheddar_farmhouse','Cheddar de ferme mâturé'],
-      ['stilton_blue','Blue Stilton AOP'], ['white_stilton','White Stilton'], ['red_leicester','Red Leicester'], ['wensleydale','Wensleydale'],
-      ['double_gloucester','Double Gloucester'], ['shropshire_blue','Shropshire Blue'], ['caerphilly','Caerphilly'], ['dunbarton_blue','Dunbarton Blue'],
-      ['dubliner','Dubliner (Irlande)'], ['cashel_blue','Cashel Blue (Irlande)'], ['gouda_vieux','Gouda Vieux (Oude Kaas)'], ['gouda_jeune','Gouda Jeune'],
-      ['edam','Edam'], ['beemster','Beemster'], ['leyden','Komijnekaas / Leyden'], ['maasdam','Maasdam'],
-      ['passendale','Passendale (Belgique)'], ['chimay_biere','Fromage de Chimay à la bière'], ['herve','Fromage de Herve AOP (Belgique)'], ['feta','Feta AOP (Grèce)'],
-      ['halloumi','Halloumi AOP (Chypre)'], ['kasseri','Kasseri AOP'], ['graviera','Graviera Naxos / Crete AOP'], ['manouri','Manouri AOP'],
-      ['mizithra','Mizithra'], ['kefalotyri','Kefalotyri'], ['beyaz_peynir','Beyaz Peynir (Turquie)'], ['tulum','Tulum Peyniri (Turquie)'],
-      ['lor_peynir','Lor Peyniri'], ['akkawi','Akkawi'], ['nabulsi','Nabulsi'], ['majdoule','Majdoule / Fromage tressé'],
-      ['tilsit','Tilsiter'], ['butterkase','Butterkäse'], ['harzer','Harzer Käse'], ['cambozola','Cambozola'],
-      ['bavaria_blu','Bavaria Blu'], ['bergkase','Tiroler Bergkäse AOP (Autriche)'], ['juustoleipa','Leipäjuusto / Cheese Bread (Finlande)'], ['gjetost','Gjetost / Brunost (Fromage brun Norvégien)'],
-      ['jarlsberg','Jarlsberg (Norvège)'], ['danablu','Danablu / Bleu Danois AOP'], ['havarti','Havarti (Danemark)'], ['esrom','Esrom AOP'],
-      ['brynza','Bryndza (Slovaquie/Pologne)'], ['oscypek','Oscypek AOP (Pologne)'], ['sulguni','Sulguni (Géorgie)'], ['korall','Tvorog / Fromage frais slave'],
-      ['monterey_jack','Monterey Jack (USA)'], ['colby','Colby Cheese (USA)'], ['pepper_jack','Pepper Jack'], ['cream_cheese','Cream Cheese / Fromage à tartiner'],
-      ['queso_fresco','Queso Fresco (Mexique)'], ['queso_oaxaca','Queso Oaxaca / Quesillo (Mexique)'], ['queso_cotija','Queso Cotija (Mexique)'], ['queijo_coalho','Queijo Coalho (Brésil)'],
-      ['paneer','Paneer (Inde)'], ['chhurpi','Chhurpi (Népal/Tibet)'], ['rubing','Rubing (Chine/Yunnan)'], ['sakura_cheese','Sakura Cheese (Japon)'],
-      ['petit_suisse','Petit-suisse'], ['babeurre','Babeurre']
+    { title: 'Produits laitiers', items: [
+      ['lait_vache','Lait de vache (entier/écrémé)'], ['fromage_pate_dure','Fromage à pâte dure (comté, gruyère...)'],
+      ['fromage_pate_molle','Fromage à pâte molle (brie, camembert...)'], ['fromage_bleu','Fromage bleu (roquefort...)'],
+      ['fromage_chevre','Fromage de chèvre'], ['mozzarella','Mozzarella'], ['fromage_frais','Fromage frais (petit-suisse...)'],
+      ['mascarpone','Mascarpone'], ['yaourt','Yaourt'], ['kefir','Kéfir'], ['creme_fraiche','Crème fraîche'],
+      ['creme_anglaise','Crème anglaise / dessert lacté'], ['glace','Glace / crème glacée'], ['beurre','Beurre'],
+      ['fromage_blanc','Fromage blanc'], ['lait_chevre','Lait de chèvre'], ['lait_brebis','Lait de brebis'],
+      ['lait_jument','Lait de jument'],
+      ['lait_concentre','Lait concentré'], ['lait_avoine','Lait d\u2019avoine'], ['lait_amande','Lait d\u2019amande'],
+      ['lait_soja','Lait de soja'],
+      ['roquefort','Roquefort'], ['comte','Comté'], ['camembert','Camembert'], ['brie','Brie de Meaux'],
+      ['reblochon','Reblochon'], ['munster','Munster'], ['epoisses','Époisses'], ['cantal','Cantal'],
+      ['saint_nectaire','Saint-Nectaire'], ['beaufort','Beaufort'], ['emmental','Emmental'],
+      ['crottin_chavignol','Crottin de Chavignol'], ['morbier','Morbier'], ['livarot','Livarot'],
+      ['pont_leveque','Pont-l\u2019Évêque'], ['tomme_savoie','Tomme de Savoie'], ['bleu_auvergne','Bleu d\u2019Auvergne'],
+      ['fourme_ambert','Fourme d\u2019Ambert'], ['maroilles','Maroilles'], ['neufchatel','Neufchâtel'],
+      ['coulommiers','Coulommiers'], ['chaource','Chaource'], ['ossau_iraty','Ossau-Iraty'],
+      ['cancoillotte','Cancoillotte'], ['saint_marcellin','Saint-Marcellin'], ['vacherin','Vacherin'],
+      ['parmesan','Parmesan'], ['pecorino','Pecorino'], ['gorgonzola','Gorgonzola'], ['ricotta','Ricotta'],
+      ['burrata','Burrata'], ['provolone','Provolone'], ['gruyere','Gruyère'], ['fromage_raclette','Fromage à raclette'],
+      ['appenzeller','Appenzeller'], ['cheddar','Cheddar'], ['stilton','Stilton'], ['gouda','Gouda'], ['edam','Edam'],
+      ['manchego','Manchego'], ['feta','Feta'], ['halloumi','Halloumi'], ['mimolette','Mimolette'],
+      ['fromage_tartiner','Fromage à tartiner (type Philadelphia)'], ['paneer','Paneer'], ['queso_fresco','Queso fresco']
     ]},
     { title: 'Épices et herbes aromatiques', items: [
       ['piment','Piment'], ['poivre_noir','Poivre noir'], ['poivre_blanc','Poivre blanc'], ['poivre_vert','Poivre vert'],
-      ['poivre_rouge','Poivre rouge'], ['curry','Curry'], ['paprika_fort','Paprika fort'], ['moutarde_forte','Moutarde forte'],
-      ['wasabi','Wasabi'], ['harissa','Harissa'], ['gingembre_frais','Gingembre frais'], ['cumin','Cumin'],
-      ['cannelle','Cannelle (en grande quantité)'], ['clou_de_girofle','Clou de girofle'], ['poivre_cayenne','Poivre de Cayenne'], ['sauce_piquante','Sauce piquante / Tabasco'],
-      ['ras_el_hanout','Ras-el-hanout'], ['vanille','Vanille'], ['curcuma','Curcuma'], ['muscade','Muscade'],
-      ['safran','Safran'], ['persil','Persil'], ['basilic','Basilic'], ['thym','Thym'],
-      ['romarin','Romarin'], ['laurier','Laurier'], ['ciboulette','Ciboulette'], ['aneth','Aneth'],
-      ['coriandre_fraiche','Coriandre fraîche'], ['estragon','Estragon'], ['origan','Origan'], ['menthe','Menthe'],
-      ['sauge','Sauge'], ['cerfeuil','Cerfeuil'], ['marjolaine','Marjolaine'], ['graines_fenouil','Graines de fenouil'],
-      ['zaatar','Za’atar'], ['sumac','Sumac'], ['garam_masala','Garam masala'], ['cinq_epices','Cinq épices chinois'],
-      ['berbere','Berbéré'], ['anis_etoile','Anis étoilé / badiane'], ['cardamome','Cardamome'], ['fenugrec','Fenugrec'],
-      ['nigelle','Nigelle'], ['piment_espelette','Piment d’Espelette'], ['poivre_sichuan','Poivre de Sichuan'], ['combava','Combava (feuilles)'],
-      ['paprika_fume','Paprika fumé / Pimentón'], ['piment_habanero','Piment Habanero'], ['piment_jalapeno','Piment Jalapeño'], ['piment_bird_eye','Piment oiseau / Rawit'],
-      ['poivre_timut','Poivre Timut / Baie du Népal'], ['baies_roses','Baies roses / Poivre rose'], ['galanga','Galanga'], ['citronnelle','Citronnelle'],
-      ['epazote','Épazote (Mexique)'], ['shiso','Shiso (Pérille noire/verte)'], ['liveche','Livèche / Céleri perpétuel'], ['sarriette','Sarriette'],
-      ['agastache','Agastache'], ['amchur','Amchur (Poudre de mangue séchée)'], ['asafoetida','Hing / Asafoetida'], ['voatsiperifery','Poivre sauvage Voatsiperifery'],
-      ['macis','Macis (fleur de muscade)'], ['piment_carolina_reaper','Piment Carolina Reaper'], ['piment_ghost','Ghost Pepper / Bhut Jolokia'], ['chili_powder','Chili Powder américain'],
-      ['old_bay','Assaisonnement Old Bay'], ['sel_celeri','Sel de céleri'], ['ail_semoule','Ail en semoule'], ['oignon_semoule','Oignon en semoule']
-    ]},
-    { title: 'Boissons non-alcoolisées, cafés et infusions', items: [
-      ['cafe','Café expresso / filtre'], ['cafe_deca','Café décaféiné'], ['chicoree','Chicorée'], ['cafe_orge','Café d’orge (Orzo)'],
-      ['the','Thé noir / vert'], ['matcha','Thé Matcha'], ['mate','Yerba Maté'], ['rooibos','Rooibos'],
-      ['camomille','Infusion de camomille'], ['verveine','Infusion de verveine'], ['tilleul','Infusion de tilleul'], ['hibiscus_bissap','Hibiscus / Bissap / Karkadé'],
-      ['menthe_poivree','Infusion de menthe poivrée'], ['jus_bouleau','Sève / Jus de bouleau'], ['eau_fleur_oranger','Eau de fleur d’oranger'], ['eau_de_rose','Eau de rose'],
-      ['the_glace_sucre','Thé glacé sucré'], ['boissons_gazeuses','Boissons gazeuses / cola'], ['eau_gazeuse','Eau gazeuse'], ['boissons_energisantes','Boissons énergisantes'],
-      ['jus_fruits_industriels','Jus de fruits industriels'], ['kombucha','Kombucha'], ['kefir_de_fruit','Kéfir de fruits'], ['eau_de_coco','Eau de coco'],
-      ['jus_herbe_ble','Jus d’herbe de blé'], ['jus_canne_sucre','Jus de canne à sucre'], ['eau_plate','Eau plate']
-    ]},
-    { title: 'Boissons alcoolisées', items: [
-      ['alcool_fort','Alcool fort / spiritueux'], ['vin_rouge','Vin rouge'], ['vin_blanc','Vin blanc'], ['vin_rose','Vin rosé'],
-      ['champagne','Champagne'], ['vin_petillant','Vin pétillant / crémant'], ['vin_liquoreux','Vin doux / liquoreux'], ['biere_blonde','Bière blonde'],
-      ['biere_brune','Bière brune'], ['biere_blanche','Bière blanche'], ['biere_ipa','Bière IPA'], ['cidre','Cidre'],
-      ['poire_alcool','Poiré'], ['sake','Saké'], ['soju','Soju'], ['mezcal','Mezcal / Tequila'],
-      ['rhum','Rhum'], ['whisky','Whisky / Bourbon'], ['vodka','Vodka'], ['gin','Gin'],
-      ['cognac_armagnac','Cognac / Armagnac'], ['kombucha_alcoolise','Hard Kombucha'], ['vermouth','Vermouth / Martini'], ['absinthe','Absinthe'],
-      ['ouzo_pastis','Pastis / Ouzo / Anisette'], ['calvados','Calvados'], ['grappa','Grappa / Eau-de-vie de vin'], ['pisco','Pisco'],
-      ['porto','Porto']
+      ['poivre_rouge','Poivre rouge'], ['curry','Curry'], ['paprika_fort','Paprika fort'],
+      ['moutarde_forte','Moutarde forte'], ['wasabi','Wasabi'], ['harissa','Harissa'], ['gingembre_frais','Gingembre frais'],
+      ['cumin','Cumin'], ['cannelle','Cannelle (en grande quantité)'], ['clou_de_girofle','Clou de girofle'],
+      ['poivre_cayenne','Poivre de Cayenne'], ['sauce_piquante','Sauce piquante / Tabasco'], ['ras_el_hanout','Ras-el-hanout'],
+      ['vanille','Vanille'], ['curcuma','Curcuma'], ['muscade','Muscade'], ['safran','Safran'],
+      ['persil','Persil'], ['basilic','Basilic'], ['thym','Thym'], ['romarin','Romarin'], ['laurier','Laurier'],
+      ['ciboulette','Ciboulette'], ['aneth','Aneth'], ['coriandre_fraiche','Coriandre fraîche'], ['estragon','Estragon'],
+      ['origan','Origan'], ['menthe','Menthe'], ['sauge','Sauge'], ['cerfeuil','Cerfeuil'], ['marjolaine','Marjolaine'],
+      ['graines_fenouil','Graines de fenouil'], ['zaatar','Za\u2019atar'], ['sumac','Sumac'], ['garam_masala','Garam masala'],
+      ['cinq_epices','Cinq épices chinois'], ['berbere','Berbéré'], ['anis_etoile','Anis étoilé / badiane'],
+      ['cardamome','Cardamome'], ['fenugrec','Fenugrec'], ['nigelle','Nigelle'], ['piment_espelette','Piment d\u2019Espelette'],
+      ['poivre_sichuan','Poivre de Sichuan'], ['combava','Combava']
     ]},
     { title: 'Algues', items: [
-      ['wakame','Wakamé'], ['kombu','Kombu'], ['nori','Nori'], ['spiruline','Spiruline'],
-      ['laitue_de_mer','Laitue de mer'], ['dulse','Dulse / Palmaria palmata'], ['haricot_de_mer','Haricot de mer / Himanthalia'], ['nori_verte','Aonori'],
-      ['hijiki','Hijiki'], ['agar_seaweed','Gelidium (Agar-agar)'], ['chlorelle','Chlorelle'], ['sea_moss','Mousse d’Irlande / Sea Moss'],
-      ['cochelayre','Cochayuyo']
+      ['wakame','Wakamé'], ['kombu','Kombu'], ['nori','Nori'], ['spiruline','Spiruline'], ['laitue_de_mer','Laitue de mer']
     ]},
-    { title: 'Fritures et plats gras', items: [
-      ['frites','Frites'], ['beignets','Beignets'], ['beignets_legumes','Beignets de légumes (tempura)'], ['charcuterie_grasse','Charcuterie grasse'],
-      ['fritures_poisson_viande','Fritures de poisson / viande'], ['poulet_frit','Poulet frit'], ['chips','Chips'], ['sauces_grasses','Sauces grasses / crèmes riches'],
-      ['fromages_fondus','Fromages gras / fondus'], ['raclette_fondue','Raclette / fondue'], ['churros','Churros'], ['empanadas_frites','Empanadas frites'],
-      ['nems','Nems / Pâtés impériaux'], ['samoussas','Samoussas frit'], ['nuggets','Nuggets frites'], ['fish_and_chips','Fish and Chips'],
-      ['onion_rings','Rondelles d’oignon frites / Onion rings'], ['croquettes','Croquettes de pommes de terre/fromage'], ['donuts','Beignets / Donuts'], ['arancini','Arancini frites']
+    { title: 'Fritures / plats gras', items: [
+      ['frites','Frites'], ['beignets','Beignets'], ['beignets_legumes','Beignets de légumes (tempura)'],
+      ['charcuterie_grasse','Charcuterie grasse'], ['fritures_poisson_viande','Fritures de poisson / viande'],
+      ['poulet_frit','Poulet frit'], ['chips','Chips'], ['sauces_grasses','Sauces grasses / crèmes riches'],
+      ['fromages_fondus','Fromages gras / fondus'], ['raclette_fondue','Raclette / fondue']
     ]},
-    { title: 'Sucres, édulcorants, chocolat et confiserie', items: [
+    { title: 'Sucres, édulcorants et chocolat', items: [
       ['sorbitol','Sorbitol'], ['xylitol','Xylitol'], ['mannitol','Mannitol'], ['maltitol','Maltitol'],
       ['isomalt','Isomalt'], ['aspartame','Aspartame'], ['stevia','Stévia'], ['miel','Miel (en excès)'],
-      ['sirop_agave','Sirop d’agave'], ['sirop_erable','Sirop d’érable (en excès)'], ['chewing_gum_sans_sucre','Chewing-gums sans sucre'], ['fruits_secs','Fruits secs (pruneaux, figues, abricots secs, raisins secs)'],
-      ['sucre_blanc','Sucre blanc'], ['sucre_roux','Sucre roux / cassonade'], ['chocolat_noir','Chocolat noir'], ['chocolat_lait','Chocolat au lait'],
-      ['chocolat_blanc','Chocolat blanc'], ['cacao_poudre','Cacao en poudre'], ['poudre_amande','Poudre d’amande'], ['pate_amande','Pâte d’amande'],
-      ['erythritol','Érythritol'], ['sucralose','Sucralose'], ['sirop_glucose_fructose','Sirop de glucose-fructose'], ['sucre_de_coco','Sucre de fleur de coco'],
-      ['muscovado','Sucre Muscovado / Rapadura'], ['melasse','Mélasse noire'], ['jaggery','Jaggery / Gur'], ['sirop_d_dattes','Sirop de dattes'],
-      ['sirop_de_riz','Sirop de riz brun'], ['galactose','Tagatose'], ['halva','Halva'], ['loukoum','Loukoum'],
-      ['nougat','Nougat / Tourron'], ['caramel','Caramel / Butterscotch'], ['praline','Praliné'], ['confiture','Confiture'],
-      ['guimauve','Guimauve']
+      ['sirop_agave','Sirop d\u2019agave'], ['sirop_erable','Sirop d\u2019érable (en excès)'],
+      ['chewing_gum_sans_sucre','Chewing-gums sans sucre'], ['fruits_secs','Fruits secs (pruneaux, figues, abricots secs, raisins secs)'],
+      ['sucre_blanc','Sucre blanc'], ['sucre_roux','Sucre roux / cassonade'], ['chocolat_noir','Chocolat noir'],
+      ['chocolat_lait','Chocolat au lait'], ['chocolat_blanc','Chocolat blanc'], ['cacao_poudre','Cacao en poudre'],
+      ['poudre_amande','Poudre d\u2019amande'], ['pate_amande','Pâte d\u2019amande']
     ]},
-    { title: 'Produits de la ruche, superaliments et suppléments', items: [
-      ['pollen_frais','Pollen frais'], ['gelee_royale','Gelée royale'], ['propolis','Propolis'], ['psyllium','Psyllium blond / brun'],
-      ['maca','Poudre de Maca'], ['baobab_poudre','Poudre de pulpe de Baobab'], ['lucuma','Poudre de Lucuma'], ['camu_camu','Poudre de Camu-Camu'],
-      ['moringa','Poudre de Moringa'], ['ashwagandha','Poudre d’Ashwagandha'], ['ginseng','Extrait de Ginseng'], ['rhodiola','Rhodiola']
-    ]},
-    { title: 'Aides à la pâtisserie, fécules et liants', items: [
-      ['fecule_mais','Fécule de maïs (Maïzena)'], ['fecule_pomme_de_terre','Fécule de pomme de terre'], ['arrow_root','Arrow-root'], ['gomme_guar','Gomme de guar'],
-      ['gomme_xanthane','Gomme de xanthane'], ['farine_caroube','Farine de graines de caroube'], ['levure_boulanger','Levure de boulanger'], ['levain_naturel','Levain naturel'],
-      ['poudre_a_lever','Poudre à lever / Levure chimique'], ['creme_tartre','Crème de tartre'], ['agar_agar','Agar-agar'], ['gelatine','Gélatine animale'],
-      ['pectine','Pectine de fruits'], ['lecithine_soja','Lécithine de soja/tournesol']
-    ]},
-    { title: 'Insectes comestibles', items: [
-      ['grillons','Grillons séchés / en poudre'], ['criquets','Criquets comestibles'], ['vers_de_farine','Vers de farine (Mollys)'], ['escamoles','Œufs de fourmis (Escamoles)'],
-      ['chenilles_mopane','Ver / Chenille de Mopane']
+    { title: 'Café / alcool / boissons', items: [
+      ['cafe','Café'], ['the','Thé noir / vert'], ['the_glace_sucre','Thé glacé sucré'], ['alcool_fort','Alcool fort / spiritueux'],
+      ['vin','Vin'], ['biere','Bière'], ['cocktails','Cocktails'], ['boissons_gazeuses','Boissons gazeuses / cola'],
+      ['eau_gazeuse','Eau gazeuse'], ['boissons_energisantes','Boissons énergisantes'], ['jus_fruits_industriels','Jus de fruits industriels'],
+      ['vin_rouge','Vin rouge'], ['vin_blanc','Vin blanc'], ['vin_rose','Vin rosé'], ['champagne','Champagne'],
+      ['vin_petillant','Vin pétillant / crémant'], ['vin_liquoreux','Vin doux / liquoreux'], ['biere_blonde','Bière blonde'],
+      ['biere_brune','Bière brune'], ['biere_blanche','Bière blanche'], ['biere_ipa','Bière IPA'], ['cidre','Cidre'],
+      ['poire_alcool','Poiré']
     ]},
     { title: 'Aliments ultra-transformés', items: [
-      ['plats_prepares','Plats préparés industriels'], ['sodas','Sodas / boissons sucrées'], ['chips_snacks','Chips et snacks apéritifs'], ['charcuterie_industrielle','Charcuterie industrielle'],
-      ['fast_food','Fast-food'], ['bonbons','Bonbons et confiseries industrielles'], ['barres_chocolatees','Barres chocolatées industrielles'], ['sauces_industrielles','Sauces industrielles (ketchup, mayo en pot...)'],
-      ['cereales_sucrees','Céréales du petit-déjeuner sucrées'], ['plats_surgeles_panes','Plats surgelés panés'], ['pizza_surgelee','Pizza surgelée'], ['soupe_industrielle','Soupe industrielle en brique'],
-      ['biscuits_aperitifs','Biscuits apéritifs extrudés'], ['surimi_batonnets','Bâtonnets de surimi transformés'], ['noodles_instantanees','Nouilles instantanées en bol/sachet'], ['pate_a_tartiner','Pâte à tartiner industrielle à l’huile de palme'],
-      ['cordon_bleu_industriel','Cordon bleu industriel'], ['nuggets_industriels','Nuggets industriels reconstitutés'], ['kebab','Kebab'], ['sauces_pretes_pates','Sauces prêtes pour pâtes'],
-      ['soupe_deshydratee','Soupe déshydratée en sachet']
-    ]},
-    { title: 'Pains, viennoiseries et pâtisserie', items: [
-      ['pain_viennois','Pain viennois'], ['brioche','Brioche'], ['croissant','Croissant'], ['pain_au_chocolat','Pain au chocolat'],
-      ['chausson_pomme','Chausson aux pommes'], ['crepe','Crêpe'], ['gaufre','Gaufre'], ['gateau_chocolat','Gâteau au chocolat'],
-      ['tarte_fruits','Tarte aux fruits'], ['tarte_creme','Tarte à la crème'], ['cookie','Cookie'], ['madeleine','Madeleine'],
-      ['financier','Financier'], ['eclair','Éclair'], ['millefeuille','Millefeuille'], ['macaron','Macaron'],
-      ['biscuit_sec','Biscuit sec'], ['cake_sale','Cake salé'], ['quiche','Quiche'], ['pizza','Pizza'],
-      ['flan_patissier','Flan pâtissier'], ['far_breton','Far breton'], ['pain_epices','Pain d’épices'], ['brownie','Brownie'],
-      ['muffin','Muffin']
+      ['plats_prepares','Plats préparés industriels'], ['sodas','Sodas / boissons sucrées'],
+      ['chips_snacks','Chips et snacks apéritifs'], ['charcuterie_industrielle','Charcuterie industrielle'],
+      ['fast_food','Fast-food'], ['bonbons','Bonbons et confiseries industrielles'],
+      ['barres_chocolatees','Barres chocolatées industrielles'], ['sauces_industrielles','Sauces industrielles (ketchup, mayo en pot...)'],
+      ['cereales_sucrees','Céréales du petit-déjeuner sucrées'], ['plats_surgeles_panes','Plats surgelés panés'],
+      ['pizza_surgelee','Pizza surgelée'], ['soupe_industrielle','Soupe industrielle en brique'],
+      ['biscuits_aperitifs','Biscuits apéritifs extrudés']
     ]}
   ];
 
